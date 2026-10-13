@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma, safeDb } from "@/lib/prisma";
+import { isAdminRequest } from "@/lib/admin-session";
+
+const unauthorized = () =>
+  NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
 // POST — create job (admin)
 export async function POST(req: Request) {
+  if (!(await isAdminRequest())) return unauthorized();
   try {
     const body = await req.json();
     const { title, slug, department, location, employmentType, experienceLevel, description, responsibilities, requirements, preferredSkills, status, isPublished } = body;
@@ -36,6 +41,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
+  if (!(await isAdminRequest())) return unauthorized();
   const jobs = await safeDb(async (db) => db.job.findMany({ orderBy: { createdAt: "desc" } }), []);
   return NextResponse.json({ jobs });
 }

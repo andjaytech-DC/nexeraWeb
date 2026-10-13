@@ -11,11 +11,11 @@ export default async function AdminApplicationsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-white/[0.03] text-xs tracking-[0.08em] font-[700] text-white/40">
-              <tr><th className="text-left px-4 py-3">Candidate</th><th className="text-left px-4 py-3">Job</th><th className="text-left px-4 py-3">Department</th><th className="text-left px-4 py-3">Email</th><th className="text-left px-4 py-3">Date</th><th className="text-left px-4 py-3">Status</th></tr>
+              <tr><th className="text-left px-4 py-3">Candidate</th><th className="text-left px-4 py-3">Job</th><th className="text-left px-4 py-3">Department</th><th className="text-left px-4 py-3">Email</th><th className="text-left px-4 py-3">Resume</th><th className="text-left px-4 py-3">Date</th><th className="text-left px-4 py-3">Status</th></tr>
             </thead>
             <tbody>
               {apps.length === 0 ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-white/50">No applications yet. Submit via /careers/job-search/[slug] when jobs are published.</td></tr>
+                <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-white/50">No applications yet. Submit via /careers/job-search/[slug] when jobs are published.</td></tr>
               ) : (
                 apps.map((a: any) => (
                   <tr key={a.id} className="border-t border-white/5">
@@ -23,6 +23,7 @@ export default async function AdminApplicationsPage() {
                     <td className="px-4 py-3 text-white/60">{a.job?.title || a.jobId}</td>
                     <td className="px-4 py-3 text-white/60">{a.job?.department || "—"}</td>
                     <td className="px-4 py-3 text-white/60">{a.email}</td>
+                    <td className="px-4 py-3">{a.resumeUrl ? <a href={`/api/admin/resumes?url=${encodeURIComponent(a.resumeUrl)}`} className="text-[#4F7EFF] hover:text-white" title={a.resumeName || "Resume"}>Download</a> : <span className="text-white/30">—</span>}</td>
                     <td className="px-4 py-3 text-xs text-white/40">{new Date(a.createdAt).toLocaleString()}</td>
                     <td className="px-4 py-3"><span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs">{a.status}</span></td>
                   </tr>

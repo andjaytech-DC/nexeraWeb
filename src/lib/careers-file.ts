@@ -19,25 +19,59 @@ export function validateResumeFile(file: File | null): string | null {
   return null;
 }
 
-export async function storeResumeFile(file: File): Promise<{ url: string; name: string; type: string; size: number }> {
+/**
+ * Vercel Blob is used whenever credentials are present. Both the OIDC pair
+ * (BLOB_STORE_ID + VERCEL_OIDC_TOKEN, the Vercel default) and the static
+ * BLOB_READ_WRITE_TOKEN are honoured — the SDK resolves them itself.
+ */
+export function isBlobStorageConfigured(): boolean {
+  return Boolean(
+    process.env.BLOB_READ_WRITE_TOKEN ||
+      (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN),
+  );
+}
+
+type StoredResume = { url: string; name: string; type: string; size: number };
+
+export async function storeResumeFile(file: File): Promise<StoredResume> {
   const ext = path.extname(file.name || "").toLowerCase() || ".pdf";
   const safeExt = ALLOWED_EXT.has(ext) ? ext : ".pdf";
   const id = randomUUID();
   const filename = `${id}${safeExt}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "resumes");
-  await mkdir(dir, { recursive: true });
-  const buf = Buffer.from(await file.arrayBuffer());
-  const fullPath = path.join(dir, filename);
-  await writeFile(fullPath, buf);
-  // Store reference, not public guessable URL — we store path, admin will authorize access
-  // For dev, we return a path that requires auth to serve
-  return {
-    url: `/uploads/resumes/${filename}`, // In production, replace with S3 key and serve via signed URL
+  const meta = {
     name: file.name,
     type: file.type || "application/octet-stream",
     size: file.size,
   };
-}
 
-// Production note: If RESUME_STORAGE_PROVIDER is set (e.g., "s3"), upload to object storage
-// and return the storage key instead of local path. Never expose private files via public URLs.
+  if (isBlobStorageConfigured()) {
+    const { put } = await import("@vercel/blob");
+    // Private: resumes are personal data. Serve them through an authorized
+    // endpoint (see src/app/api/admin/resumes/route.ts), never a public URL.
+    const blob = await put(`resumes/${filename}`, file, {
+      access: "private",
+      contentType: meta.type,
+      addRandomSuffix: false,
+    });
+    return { url: blob.url, ...meta };
+  }
+
+  if (process.env.VERCEL) {
+    // Vercel's filesystem is read-only — fail loudly instead of returning a
+    // URL that can never be served.
+    throw new Error(
+      "Resume storage is not configured on Vercel. Connect a Vercel Blob store (sets BLOB_STORE_ID + VERCEL_OIDC_TOKEN) or set BLOB_READ_WRITE_TOKEN.",
+    );
+  }
+
+  console.warn(
+    "[careers-file] BLOB_* not set — storing resume on the local filesystem. Dev only.",
+  );
+  const dir = path.join(process.cwd(), "public", "uploads", "resumes");
+  await mkdir(dir, { recursive: true });
+  const buf = Buffer.from(await file.arrayBuffer());
+  await writeFile(path.join(dir, filename), buf);
+  // Dev-only path. In production this is replaced by a private Blob URL served
+  // via /api/admin/resumes.
+  return { url: `/uploads/resumes/${filename}`, ...meta };
+}
