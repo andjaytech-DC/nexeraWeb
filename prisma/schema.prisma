@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Business inquiry (future migration from localStorage — kept for reference,
+// currently still served via replaceable InquiryRepository; when API ready,
+// this model can be used)
+model Inquiry {
+  id               String   @id @default(cuid())
+  name             String
+  email            String
+  company          String?
+  phone            String?
+  service          String
+  projectType      String
+  budget           String?
+  timeline         String?
+  description      String   @db.Text
+  preferredContact String?
+  status           String   @default("NEW")
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+// ── Careers ──
+model Job {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  department      String
+  location        String
+  employmentType  String
+  experienceLevel String?
+  description     String   @db.Text
+  responsibilities String  @db.Text
+  requirements    String   @db.Text
+  preferredSkills String?  @db.Text
+  status          String   @default("Draft")
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  applications    JobApplication[]
+
+  @@index([isPublished, status])
+  @@index([department])
+}
+
+model JobApplication {
+  id          String   @id @default(cuid())
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  fullName    String
+  email       String
+  phone       String?
+  location    String?
+  linkedinUrl String?
+  portfolioUrl String?
+  resumeUrl   String?
+  resumeName  String?
+  resumeType  String?
+  resumeSize  Int?
+  coverLetter String?  @db.Text
+  status      String   @default("New")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([jobId])
+  @@index([status])
+}
+
+model TalentProfile {
+  id               String   @id @default(cuid())
+  fullName         String
+  email            String
+  phone            String?
+  location         String?
+  linkedinUrl      String?
+  portfolioUrl     String?
+  yearsExperience  String?
+  areaOfInterest   String
+  employmentType   String
+  resumeUrl        String?
+  resumeName       String?
+  resumeType       String?
+  resumeSize       Int?
+  message          String?  @db.Text
+  consent          Boolean  @default(false)
+  status           String   @default("New")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([areaOfInterest])
+  @@index([status])
+}
