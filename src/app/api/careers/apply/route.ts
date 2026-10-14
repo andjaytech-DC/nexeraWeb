@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma, safeDb } from "@/lib/prisma";
+import { safeDb } from "@/lib/prisma";
 import { validateResumeFile, storeResumeFile } from "@/lib/careers-file";
 
 export async function POST(req: Request) {

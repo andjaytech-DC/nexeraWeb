@@ -1,7 +1,10 @@
+import type { Job, JobApplication } from "@prisma/client";
 import { safeDb } from "@/lib/prisma";
 
+type ApplicationRow = JobApplication & { job: Job };
+
 export default async function AdminApplicationsPage() {
-  const apps = await safeDb(async (db) => db.jobApplication.findMany({ include: { job: true }, orderBy: { createdAt: "desc" }, take: 100 }), [] as any[]);
+  const apps = await safeDb(async (db) => db.jobApplication.findMany({ include: { job: true }, orderBy: { createdAt: "desc" }, take: 100 }), [] as ApplicationRow[]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-8">
@@ -17,7 +20,7 @@ export default async function AdminApplicationsPage() {
               {apps.length === 0 ? (
                 <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-white/50">No applications yet. Submit via /careers/job-search/[slug] when jobs are published.</td></tr>
               ) : (
-                apps.map((a: any) => (
+                apps.map((a) => (
                   <tr key={a.id} className="border-t border-white/5">
                     <td className="px-4 py-3 text-white">{a.fullName}</td>
                     <td className="px-4 py-3 text-white/60">{a.job?.title || a.jobId}</td>

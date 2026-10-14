@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { contactInfo } from "@/lib/site-data";
 
 export function Footer() {
   return (
@@ -12,7 +13,8 @@ export function Footer() {
             <p className="mt-4 text-xs leading-5 text-white/30">
               3rd Floor, D23 Building, S3V Business Park, Sector-59<br />
               Noida, Gautambuddha Nagar, UP – 201301, India<br />
-              <a href="tel:+919696305326" className="text-white/60 hover:text-white">+91 9696305326</a>
+              <a href={contactInfo.phoneHref} className="text-white/60 hover:text-white">{contactInfo.phoneDisplay}</a><br />
+              <a href={contactInfo.emailHref} className="text-white/60 hover:text-white">{contactInfo.email}</a>
             </p>
           </div>
           <div>

@@ -2,8 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { prisma, safeDb } from "@/lib/prisma";
+import { safeDb } from "@/lib/prisma";
 import JobSearchClient from "./JobSearchClient";
+
+type JobListItem = {
+  id: string;
+  title: string;
+  slug: string;
+  department: string;
+  location: string;
+  employmentType: string;
+  experienceLevel: string | null;
+  createdAt: Date;
+};
 
 export const metadata: Metadata = {
   title: "Job Search — Careers | Nexara Global Solutions",
@@ -17,7 +28,7 @@ export default async function JobSearchPage() {
       orderBy: { createdAt: "desc" },
       select: { id: true, title: true, slug: true, department: true, location: true, employmentType: true, experienceLevel: true, createdAt: true },
     });
-  }, [] as any[]);
+  }, [] as JobListItem[]);
 
   return (
     <div className="bg-[#070A0F] text-[#E6EAF0]">

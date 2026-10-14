@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
+import { contactInfo } from "@/lib/site-data";
 
 const nav = [
   { label: "Solutions", href: "/solutions" },
@@ -33,7 +34,14 @@ export function Header() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-  useEffect(() => { setOpen(false); setCareersOpen(false); }, [pathname]);
+  // Close the menus when the route changes (adjusting state during render
+  // rather than in an effect).
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setOpen(false);
+    setCareersOpen(false);
+  }
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#070A0F]/80 border-b border-white/[0.06]">
@@ -130,7 +138,9 @@ export function Header() {
             <Link href="/contact" className="py-2 text-white/80 hover:text-white border-b border-white/5">Contact</Link>
           </nav>
           <Link href="/contact?type=new-project" className="flex items-center justify-center rounded-full bg-white text-[#070A0F] font-[700] py-3">Start a Project →</Link>
-          <p className="text-center text-xs text-white/40">3rd Floor, D23 Building, S3V Business Park, Sector-59, Noida — +91 9696305326</p>
+          <p className="text-center text-xs text-white/40">3rd Floor, D23 Building, S3V Business Park, Sector-59, Noida<br />
+            <a href={contactInfo.phoneHref} className="hover:text-white/70">{contactInfo.phoneDisplay}</a> · <a href={contactInfo.emailHref} className="hover:text-white/70">{contactInfo.email}</a>
+          </p>
         </div>
       )}
     </header>

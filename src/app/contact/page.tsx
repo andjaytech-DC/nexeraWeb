@@ -3,10 +3,11 @@ import { Suspense } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import ContactClient from "./ContactClient";
+import { contactInfo } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Contact — Talk to Our Team | Nexara Global Solutions",
-  description: "Start a project or talk to our team. Nexara Global Solutions, 3rd Floor, D23 Building, S3V Business Park, Sector-59, Noida — +91 9696305326",
+  description: `Start a project or talk to our team. Nexara Global Solutions, 3rd Floor, D23 Building, S3V Business Park, Sector-59, Noida — ${contactInfo.phoneDisplay}`,
 };
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   },
   description:
     "Nexara Global Solutions helps businesses turn complex challenges into intelligent digital products, enterprise platforms, AI-powered software and scalable technology solutions. Noida, India.",
-  metadataBase: new URL("https://nexara.example.com"),
+  metadataBase: new URL(siteUrl()),
   openGraph: {
     type: "website",
     locale: "en_IN",

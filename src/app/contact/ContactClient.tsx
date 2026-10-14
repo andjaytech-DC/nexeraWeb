@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { inquiryRepository, serviceOptions, projectTypeOptions } from "@/lib/inquiry-store";
+import { contactInfo } from "@/lib/site-data";
 
 export default function ContactClient({ initialType }: { initialType?: string }) {
   const searchParams = useSearchParams();
@@ -22,9 +23,13 @@ export default function ContactClient({ initialType }: { initialType?: string })
   const [description, setDescription] = useState("");
   const [preferredContact, setPreferredContact] = useState("Email");
 
-  useEffect(() => {
+  // Adjust state during render when the prop changes (React's recommended
+  // alternative to syncing state inside an effect).
+  const [prevIsNewProject, setPrevIsNewProject] = useState(isNewProject);
+  if (prevIsNewProject !== isNewProject) {
+    setPrevIsNewProject(isNewProject);
     if (isNewProject && !projectType) setProjectType("New Product");
-  }, [isNewProject, projectType]);
+  }
 
   function validate() {
     const e: Record<string, string> = {};
@@ -95,7 +100,8 @@ export default function ContactClient({ initialType }: { initialType?: string })
               Sector-59, Noida, Gautambuddha Nagar<br />
               Uttar Pradesh – 201301, India
             </p>
-            <p className="mt-4 text-sm font-[600] text-white">Phone: <a href="tel:+919696305326" className="text-[#4F7EFF] hover:text-white">+91 9696305326</a></p>
+            <p className="mt-4 text-sm font-[600] text-white">Phone: <a href={contactInfo.phoneHref} className="text-[#4F7EFF] hover:text-white">{contactInfo.phoneDisplay}</a></p>
+            <p className="mt-1.5 text-sm font-[600] text-white">Email: <a href={contactInfo.emailHref} className="text-[#4F7EFF] hover:text-white">{contactInfo.email}</a></p>
             <div className="mt-6 rounded-xl overflow-hidden border border-white/5 bg-white/[0.03] h-[180px] flex items-center justify-center">
               <div className="text-center p-6">
                 <div className="text-xs tracking-[0.12em] font-[700] text-white/30">MAP</div>

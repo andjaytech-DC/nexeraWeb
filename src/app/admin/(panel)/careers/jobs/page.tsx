@@ -1,8 +1,9 @@
 import Link from "next/link";
+import type { Job } from "@prisma/client";
 import { safeDb } from "@/lib/prisma";
 
 export default async function AdminJobsPage() {
-  const jobs = await safeDb(async (db) => db.job.findMany({ orderBy: { createdAt: "desc" } }), [] as any[]);
+  const jobs = await safeDb(async (db) => db.job.findMany({ orderBy: { createdAt: "desc" } }), [] as Job[]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-8">
@@ -42,7 +43,7 @@ export default async function AdminJobsPage() {
                   </div>
                 </td></tr>
               ) : (
-                jobs.map((j: any) => (
+                jobs.map((j) => (
                   <tr key={j.id} className="border-t border-white/5">
                     <td className="px-4 py-3 text-white">{j.title}<div className="text-xs text-white/40">/{j.slug}</div></td>
                     <td className="px-4 py-3 text-white/60">{j.department}</td>

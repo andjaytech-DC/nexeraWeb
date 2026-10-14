@@ -1,7 +1,8 @@
+import type { TalentProfile } from "@prisma/client";
 import { safeDb } from "@/lib/prisma";
 
 export default async function AdminTalentPage() {
-  const profiles = await safeDb(async (db) => db.talentProfile.findMany({ orderBy: { createdAt: "desc" }, take: 100 }), [] as any[]);
+  const profiles = await safeDb(async (db) => db.talentProfile.findMany({ orderBy: { createdAt: "desc" }, take: 100 }), [] as TalentProfile[]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-8">
@@ -17,7 +18,7 @@ export default async function AdminTalentPage() {
               {profiles.length === 0 ? (
                 <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-white/50">No talent profiles yet. Submissions from Send Resume and Talent Community will appear here.</td></tr>
               ) : (
-                profiles.map((p: any) => (
+                profiles.map((p) => (
                   <tr key={p.id} className="border-t border-white/5">
                     <td className="px-4 py-3 text-white">{p.fullName}</td>
                     <td className="px-4 py-3 text-white/60">{p.email}</td>

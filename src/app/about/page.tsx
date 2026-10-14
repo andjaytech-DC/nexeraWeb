@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { contactInfo } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "About — Nexara Global Solutions",
@@ -26,7 +27,8 @@ export default function AboutPage() {
           <div className="mt-6 rounded-xl bg-[#070A0F] border border-white/5 p-5">
             <div className="text-xs tracking-[0.12em] font-[700] text-white/40">PRINCIPAL PLACE OF BUSINESS</div>
             <p className="mt-2 text-sm leading-6 text-white/70">3rd Floor, D23 Building, S3V Business Park<br />Sector-59, Noida, Gautambuddha Nagar<br />Uttar Pradesh – 201301, India</p>
-            <p className="mt-3 text-sm font-[600] text-white">Phone: <a href="tel:+919696305326" className="text-[#4F7EFF] hover:text-white">+91 9696305326</a></p>
+            <p className="mt-3 text-sm font-[600] text-white">Phone: <a href={contactInfo.phoneHref} className="text-[#4F7EFF] hover:text-white">{contactInfo.phoneDisplay}</a></p>
+            <p className="mt-1.5 text-sm font-[600] text-white">Email: <a href={contactInfo.emailHref} className="text-[#4F7EFF] hover:text-white">{contactInfo.email}</a></p>
           </div>
         </div>
         <div className="space-y-6">

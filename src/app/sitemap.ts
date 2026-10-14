@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/site-url";
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://nexara.example.com";
+  const base = siteUrl();
   const routes = [
     "",
     "/solutions",

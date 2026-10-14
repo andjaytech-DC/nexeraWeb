@@ -38,6 +38,14 @@ export const industries = [
   { slug: "professional-services", title: "Professional Services" },
 ] as const;
 
+// Company contact details — single source so they stay in sync sitewide.
+export const contactInfo = {
+  phoneDisplay: "+91 8882033199",
+  phoneHref: "tel:+918882033199",
+  email: "andjaytech@gmail.com",
+  emailHref: "mailto:andjaytech@gmail.com",
+} as const;
+
 export const insightCategories = [
   { slug: "ai", title: "AI" },
   { slug: "digital-transformation", title: "Digital Transformation" },

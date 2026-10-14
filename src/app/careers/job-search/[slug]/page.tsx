@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Job } from "@prisma/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { prisma, safeDb } from "@/lib/prisma";
+import { siteUrl } from "@/lib/site-url";
+import { safeDb } from "@/lib/prisma";
 import JobApplyForm from "./JobApplyForm";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as any);
+  const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
   if (!job || !job.isPublished) return { title: "Job — Nexara Careers", robots: { index: false } };
   return {
     title: `${job.title} — ${job.department} | Nexara Careers`,
@@ -17,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function JobDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as any);
+  const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
 
   if (!job || !job.isPublished || job.status !== "Published") {
     return (
@@ -43,7 +45,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
     description: job.description,
     datePosted: job.createdAt,
     employmentType: job.employmentType,
-    hiringOrganization: { "@type": "Organization", name: "Nexara Global Solutions", sameAs: "https://nexara.example.com" },
+    hiringOrganization: { "@type": "Organization", name: "Nexara Global Solutions", sameAs: siteUrl() },
     jobLocation: { "@type": "Place", address: job.location },
   };
 

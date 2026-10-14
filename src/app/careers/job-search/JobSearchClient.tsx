@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 
 type Job = {
-  id: string; title: string; slug: string; department: string; location: string; employmentType: string; experienceLevel?: string | null; createdAt: string;
+  id: string; title: string; slug: string; department: string; location: string; employmentType: string; experienceLevel?: string | null; createdAt: Date;
 };
 
 export default function JobSearchClient({ initialJobs }: { initialJobs: Job[] }) {

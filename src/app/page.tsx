@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { solutions, services } from "@/lib/site-data";
+import { solutions, services, contactInfo } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Nexara Global Solutions — Build Better. Operate Smarter. Grow Faster.",
@@ -513,7 +513,7 @@ export default function Home() {
               <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-8 py-3.5 text-[14px] font-[600] text-white hover:bg-white/10 transition w-full lg:w-auto">
                 Talk to our team
               </Link>
-              <p className="text-xs text-white/35 text-center lg:text-right">3rd Floor, D23 Building, S3V Business Park, Sector-59, Noida — +91 9696305326</p>
+              <p className="text-xs text-white/35 text-center lg:text-right">3rd Floor, D23 Building, S3V Business Park, Sector-59, Noida — {contactInfo.phoneDisplay} · {contactInfo.email}</p>
             </div>
           </div>
         </div>
