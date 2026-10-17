@@ -65,13 +65,14 @@ export async function storeResumeFile(file: File): Promise<StoredResume> {
   }
 
   console.warn(
-    "[careers-file] BLOB_* not set — storing resume on the local filesystem. Dev only.",
+    "[careers-file] Blob storage not configured — storing resume on the local filesystem. Dev only.",
   );
-  const dir = path.join(process.cwd(), "public", "uploads", "resumes");
+  const dir = path.join(process.cwd(), ".data", "resumes");
   await mkdir(dir, { recursive: true });
   const buf = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(dir, filename), buf);
-  // Dev-only path. In production this is replaced by a private Blob URL served
-  // via /api/admin/resumes.
-  return { url: `/uploads/resumes/${filename}`, ...meta };
+  // Dev-only path under .data/ (never public/). In production this branch is
+  // unreachable: storeResumeFile throws on Vercel without a Blob store before
+  // reaching the filesystem fallback, and DB-gated routes reject with 503.
+  return { url: `/resumes/${filename}`, ...meta };
 }

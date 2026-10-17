@@ -1,46 +1,119 @@
-import { NextResponse } from "next/server";
 import { safeDb } from "@/lib/prisma";
 import { validateResumeFile, storeResumeFile } from "@/lib/careers-file";
+import {
+  asOptionalText,
+  callerIdentity,
+  checkRateLimit,
+  fail,
+  normalizeIdempotencyKey,
+  ok,
+  safeMessage,
+} from "@/lib/intake-server";
+import {
+  checkProfileUrls,
+  forwardCareersWebhook,
+  isCareersWebhookConfigured,
+  isDbConfigured,
+  parseCommonFields,
+  requireConsent,
+  requireEmail,
+  requireName,
+} from "@/lib/careers-server";
 
 export async function POST(req: Request) {
   try {
+    const identity = `careers-resume:${callerIdentity(req)}`;
+    const { limited, retryAfterSec } = checkRateLimit(identity, {
+      limit: 10,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (limited) {
+      const res = fail(429, "Too many submissions. Please wait a few minutes and try again.", {
+        retryAfterSec,
+      });
+      res.headers.set("Retry-After", String(retryAfterSec));
+      return res;
+    }
+
+    if (!isDbConfigured()) {
+      // Records cannot be persisted without a database — reject truthfully.
+      return fail(
+        503,
+        "Resume intake is unavailable right now. Please try again later or email us directly.",
+        { code: "DB_UNAVAILABLE" },
+      );
+    }
+
     const form = await req.formData();
-    const fullName = String(form.get("fullName") || "").trim();
-    const email = String(form.get("email") || "").trim();
-    const phone = String(form.get("phone") || "").trim();
-    const location = String(form.get("location") || "").trim();
-    const linkedinUrl = String(form.get("linkedinUrl") || "").trim();
-    const portfolioUrl = String(form.get("portfolioUrl") || "").trim();
-    const yearsExperience = String(form.get("yearsExperience") || "").trim();
-    const areaOfInterest = String(form.get("areaOfInterest") || "").trim();
-    const employmentType = String(form.get("employmentType") || "").trim();
-    const message = String(form.get("message") || "").trim();
-    const consent = form.get("consent");
+    const fields = parseCommonFields(form);
+    const location = asOptionalText(form.get("location"), 200);
+    const yearsExperience = asOptionalText(form.get("yearsExperience"), 20);
+    const areaOfInterest = asOptionalText(form.get("areaOfInterest"), 120);
+    const employmentType = asOptionalText(form.get("employmentType"), 40) || "Full-time";
+    const message = asOptionalText(form.get("message"), 8000);
     const file = form.get("resume") as File | null;
 
-    if (!fullName || fullName.length < 2) return NextResponse.json({ error: "Full name is required" }, { status: 400 });
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
-    if (!phone) return NextResponse.json({ error: "Phone is required" }, { status: 400 });
-    if (!location) return NextResponse.json({ error: "Location is required" }, { status: 400 });
-    if (!yearsExperience) return NextResponse.json({ error: "Years of experience is required" }, { status: 400 });
-    if (!areaOfInterest) return NextResponse.json({ error: "Area of interest is required" }, { status: 400 });
-    if (!employmentType) return NextResponse.json({ error: "Employment type is required" }, { status: 400 });
-    if (!consent) return NextResponse.json({ error: "Consent is required" }, { status: 400 });
+    const nameErr = requireName(fields);
+    if (nameErr) return fail(400, nameErr.message, { field: "fullName" });
+    const emailErr = requireEmail(fields);
+    if (emailErr) return fail(400, emailErr.message, { field: "email" });
+    if (!fields.phone) return fail(400, "Phone is required", { field: "phone" });
+    if (!location) return fail(400, "Location is required", { field: "location" });
+    if (!yearsExperience) return fail(400, "Years of experience is required", { field: "yearsExperience" });
+    if (!areaOfInterest) return fail(400, "Area of interest is required", { field: "areaOfInterest" });
+    if (!employmentType) return fail(400, "Employment type is required", { field: "employmentType" });
+    const urlErr = checkProfileUrls(fields);
+    if (urlErr) return fail(400, urlErr.message, { field: "linkedinUrl" });
+    const consentErr = requireConsent(form);
+    if (consentErr) return fail(400, consentErr.message, { field: "consent" });
 
     const fileErr = validateResumeFile(file);
-    if (fileErr) return NextResponse.json({ error: fileErr }, { status: 400 });
+    if (fileErr) return fail(400, fileErr, { field: "resume" });
 
-    const stored = await storeResumeFile(file as File);
+    const { key } = normalizeIdempotencyKey(form.get("idempotencyKey"));
+
+    // Storage failure (e.g. no Blob store on Vercel) → truthful 503.
+    let stored;
+    try {
+      stored = await storeResumeFile(file as File);
+    } catch (e) {
+      console.error("[careers] resume storage failed", safeMessage(e, "Storage unavailable."));
+      return fail(
+        503,
+        "Resume storage is unavailable right now. Please try again later or email us directly.",
+        { code: "STORAGE_UNAVAILABLE" },
+      );
+    }
 
     const created = await safeDb(async (db) => {
-      return db.talentProfile.create({
-        data: {
-          fullName,
-          email,
-          phone,
+      return db.talentProfile.upsert({
+        where: { id: key },
+        update: {
+          fullName: fields.fullName,
+          email: fields.email,
+          phone: fields.phone,
           location,
-          linkedinUrl: linkedinUrl || null,
-          portfolioUrl: portfolioUrl || null,
+          linkedinUrl: fields.linkedinUrl || null,
+          portfolioUrl: fields.portfolioUrl || null,
+          yearsExperience,
+          areaOfInterest,
+          employmentType,
+          resumeUrl: stored.url,
+          resumeName: stored.name,
+          resumeType: stored.type,
+          resumeSize: stored.size,
+          message: message || null,
+          consent: true,
+          status: "New",
+        },
+        create: {
+          id: key,
+          fullName: fields.fullName,
+          email: fields.email,
+          phone: fields.phone,
+          location,
+          linkedinUrl: fields.linkedinUrl || null,
+          portfolioUrl: fields.portfolioUrl || null,
           yearsExperience,
           areaOfInterest,
           employmentType,
@@ -56,12 +129,44 @@ export async function POST(req: Request) {
     }, null as unknown as { id: string });
 
     if (!created) {
-      console.warn("[careers] resume — DB not configured, not persisted", { email });
-      return NextResponse.json({ ok: true, warning: "DB not configured — profile not persisted. Configure DATABASE_URL." });
+      return fail(
+        503,
+        "We could not save your profile right now. Please try again later or email us directly.",
+        { code: "DB_UNAVAILABLE" },
+      );
     }
-    return NextResponse.json({ ok: true, id: created.id });
+
+    // Best-effort webhook fan-out — storage already succeeded, so annotate truthfully.
+    let forwarded = false;
+    if (isCareersWebhookConfigured()) {
+      try {
+        await forwardCareersWebhook({
+          type: "talent_profile",
+          id: created.id,
+          fullName: fields.fullName,
+          email: fields.email,
+          phone: fields.phone,
+          location,
+          linkedinUrl: fields.linkedinUrl || null,
+          portfolioUrl: fields.portfolioUrl || null,
+          yearsExperience,
+          areaOfInterest,
+          employmentType,
+          resumeUrl: stored.url,
+          resumeName: stored.name,
+          message: message || null,
+          status: "New",
+          createdAt: new Date().toISOString(),
+        });
+        forwarded = true;
+      } catch (e) {
+        console.error("[careers] resume webhook failed", safeMessage(e, "Webhook failed."));
+      }
+    }
+
+    return ok({ id: created.id, forwarded });
   } catch (e) {
     console.error("[careers] resume error", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return fail(500, "Internal error. Please try again.");
   }
 }

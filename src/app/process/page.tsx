@@ -4,8 +4,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Process — How Nexara Delivers | Nexara Global Solutions",
+  title: "Process — How Nexara Delivers",
   description: "Our delivery process: Discover, Define, Design, Build, Launch, Evolve — a premium consulting and engineering narrative for transparent delivery.",
+  alternates: { canonical: "/process" },
+  openGraph: { title: "Process — How Nexara Delivers", description: "Our delivery process: Discover, Define, Design, Build, Launch, Evolve — a premium consulting and engineering narrative for transparent delivery." },
 };
 
 const steps = [
@@ -19,32 +21,32 @@ const steps = [
 
 export default function ProcessPage() {
   return (
-    <div className="bg-[#070A0F] text-[#E6EAF0]">
+    <div className="bg-canvas text-ink">
       <Header />
-      <section className="border-b border-white/[0.06] bg-[#0C1018]">
+      <section className="border-b border-line bg-surface">
         <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <p className="text-[11px] tracking-[0.18em] font-[700] text-[#4F7EFF]">PROCESS</p>
-          <h1 className="mt-3 font-[var(--font-jakarta)] text-[36px] sm:text-[48px] font-[800] tracking-[-0.04em] leading-[0.9] text-white">How Nexara Delivers</h1>
-          <p className="mt-4 max-w-[640px] text-[15px] leading-7 text-white/60">An established engineering process — not a generic six-card component. Transparent, governed and built for real business delivery.</p>
+          <p className="text-[11px] tracking-[0.18em] font-[700] text-brand">PROCESS</p>
+          <h1 className="mt-3 font-[var(--font-jakarta)] text-[36px] sm:text-[48px] font-[800] tracking-[-0.04em] leading-[0.9] text-ink">How Nexara Delivers</h1>
+          <p className="mt-4 max-w-[640px] text-[15px] leading-7 text-ink-secondary">An established engineering process — not a generic six-card component. Transparent, governed and built for real business delivery.</p>
         </div>
       </section>
 
       <section className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="relative">
-          <div className="hidden lg:block absolute left-[28px] top-6 bottom-6 w-px bg-gradient-to-b from-[#4F7EFF]/40 via-white/10 to-transparent" />
+          <div className="hidden lg:block absolute left-[28px] top-6 bottom-6 w-px bg-gradient-to-b from-brand/40 via-white/10 to-transparent" />
           <div className="grid gap-6">
             {steps.map((s) => (
-              <div key={s.n} className="relative grid lg:grid-cols-[72px_1fr_0.9fr] gap-6 rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-                <div className="hidden lg:flex h-12 w-12 items-center justify-center rounded-xl bg-[#4F7EFF] text-white font-[800] text-sm shadow-[0_8px_20px_rgba(79,126,255,0.3)]">{s.n}</div>
-                <div className="lg:hidden text-xs tracking-[0.12em] font-[800] text-[#4F7EFF]">{s.n}</div>
+              <div key={s.n} className="relative grid lg:grid-cols-[72px_1fr_0.9fr] gap-6 rounded-2xl border border-line bg-surface p-7">
+                <div className="hidden lg:flex h-12 w-12 items-center justify-center rounded-xl bg-brand text-white font-[800] text-sm shadow-[0_8px_20px_rgba(49,94,251,0.3)]">{s.n}</div>
+                <div className="lg:hidden text-xs tracking-[0.12em] font-[800] text-brand">{s.n}</div>
                 <div>
-                  <h2 className="text-[18px] font-[700] tracking-[-0.01em] text-white">{s.t}</h2>
-                  <p className="mt-2 text-sm leading-6 text-white/60">{s.d}</p>
+                  <h2 className="text-[18px] font-[700] tracking-[-0.01em] text-ink">{s.t}</h2>
+                  <p className="mt-2 text-sm leading-6 text-ink-secondary">{s.d}</p>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.03] p-5">
+                <div className="rounded-xl border border-line bg-surface-alt p-5">
                   <ul className="space-y-2">
                     {s.bullets.map((b) => (
-                      <li key={b} className="flex items-center gap-2 text-sm text-white/60"><span className="h-1.5 w-1.5 rounded-full bg-[#4F7EFF]/60" />{b}</li>
+                      <li key={b} className="flex items-center gap-2 text-sm text-ink-secondary"><span className="h-1.5 w-1.5 rounded-full bg-brand/60" />{b}</li>
                     ))}
                   </ul>
                 </div>
@@ -54,29 +56,29 @@ export default function ProcessPage() {
         </div>
 
         <div className="mt-10 grid lg:grid-cols-3 gap-5">
-          <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-            <h3 className="text-xs tracking-[0.14em] font-[700] text-white/60">WHAT YOU CAN EXPECT</h3>
-            <ul className="mt-4 space-y-2 text-sm text-white/70">
-              <li className="flex gap-2"><span className="text-[#4F7EFF]">•</span> Architecture reviews and security by default</li>
-              <li className="flex gap-2"><span className="text-[#4F7EFF]">•</span> Sprints with demos and transparent reporting</li>
-              <li className="flex gap-2"><span className="text-[#4F7EFF]">•</span> Documentation, training and runbooks</li>
-              <li className="flex gap-2"><span className="text-[#4F7EFF]">•</span> Support and continuous improvement after launch</li>
+          <div className="rounded-2xl border border-line bg-surface p-7">
+            <h3 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">WHAT YOU CAN EXPECT</h3>
+            <ul className="mt-4 space-y-2 text-sm text-ink-secondary">
+              <li className="flex gap-2"><span className="text-brand">•</span> Architecture reviews and security by default</li>
+              <li className="flex gap-2"><span className="text-brand">•</span> Sprints with demos and transparent reporting</li>
+              <li className="flex gap-2"><span className="text-brand">•</span> Documentation, training and runbooks</li>
+              <li className="flex gap-2"><span className="text-brand">•</span> Support and continuous improvement after launch</li>
             </ul>
           </div>
-          <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-            <h3 className="text-xs tracking-[0.14em] font-[700] text-white/60">ENGAGEMENT MODELS</h3>
-            <ul className="mt-4 space-y-2 text-sm text-white/70">
+          <div className="rounded-2xl border border-line bg-surface p-7">
+            <h3 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">ENGAGEMENT MODELS</h3>
+            <ul className="mt-4 space-y-2 text-sm text-ink-secondary">
               <li>Project delivery — fixed scope and roadmap</li>
               <li>Dedicated team — pod that extends your team</li>
               <li>Long-term partnership — evolution and scale</li>
             </ul>
           </div>
-          <div className="rounded-2xl bg-[#4F7EFF] p-7 text-white flex flex-col justify-between">
+          <div className="rounded-2xl bg-brand p-7 text-white flex flex-col justify-between">
             <div>
               <h3 className="text-sm font-[700]">Start with Discovery</h3>
               <p className="mt-2 text-sm text-white/80">We map your business challenge to the right approach before proposing technology.</p>
             </div>
-            <Link href="/contact?type=new-project" className="mt-6 inline-flex rounded-full bg-white text-[#070A0F] px-6 py-2.5 text-sm font-[700] hover:bg-white/90 transition self-start">Start a Project →</Link>
+            <Link href="/contact?type=new-project" className="mt-6 inline-flex rounded-full bg-brand text-white px-6 py-2.5 text-sm font-[700] hover:bg-brand-hover transition self-start">Start a Project →</Link>
           </div>
         </div>
       </section>

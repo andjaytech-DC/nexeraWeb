@@ -46,6 +46,14 @@ export const contactInfo = {
   emailHref: "mailto:andjaytech@gmail.com",
 } as const;
 
+// Notification routing — read only by the contact intake route, never
+// exposed to the client. Set these to route accepted inquiries to an email
+// inbox, CRM, or support desk. Leave empty to disable.
+export const notificationRouting = {
+  toEmail: process.env.CONTACT_TO_EMAIL ?? "",
+  toName: process.env.CONTACT_TO_NAME ?? "",
+} as const;
+
 export const insightCategories = [
   { slug: "ai", title: "AI" },
   { slug: "digital-transformation", title: "Digital Transformation" },

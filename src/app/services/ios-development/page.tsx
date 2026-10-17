@@ -3,91 +3,93 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
-  title: "iOS Development — Services | Nexara Global Solutions",
+  title: "iOS Development — Services",
   description: "Native and cross-platform iPhone / iPad applications.",
+  alternates: { canonical: "/services/ios-development" },
+  openGraph: { title: "iOS Development — Services", description: "Native and cross-platform iPhone / iPad applications." },
 };
 export default function Page(){
   return (
-    <div className="bg-[#070A0F] text-[#E6EAF0]">
+    <div className="bg-canvas text-ink">
       <Header />
-      <section className="border-b border-white/[0.06] bg-[#0C1018]">
+      <section className="border-b border-line bg-surface">
         <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="flex items-center gap-3 text-[11px] tracking-[0.16em] font-[700] text-white/40"><Link href="/services" className="hover:text-white">SERVICES</Link><span>/</span><span className="text-white/60">iOS Development</span></div>
-          <h1 className="mt-3 font-[var(--font-jakarta)] text-[34px] sm:text-[46px] font-[800] tracking-[-0.04em] leading-[0.9] text-white">iOS Development</h1>
-          <p className="mt-4 max-w-[640px] text-sm leading-6 text-white/60">Native and cross-platform iPhone / iPad applications. <span className="text-white/80">iOS experiences for iPhone and iPad — native when performance matters, cross-platform when it speeds delivery.</span></p>
+          <div className="flex items-center gap-3 text-[11px] tracking-[0.16em] font-[700] text-ink-muted"><Link href="/services" className="hover:text-brand">SERVICES</Link><span>/</span><span className="text-ink-secondary">iOS Development</span></div>
+          <h1 className="mt-3 font-[var(--font-jakarta)] text-[34px] sm:text-[46px] font-[800] tracking-[-0.04em] leading-[0.9] text-ink">iOS Development</h1>
+          <p className="mt-4 max-w-[640px] text-sm leading-6 text-ink-secondary">Native and cross-platform iPhone / iPad applications. <span className="text-ink-secondary">iOS experiences for iPhone and iPad — native when performance matters, cross-platform when it speeds delivery.</span></p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/contact?type=new-project" className="rounded-full bg-[#4F7EFF] px-6 py-2.5 text-sm font-[700] text-white hover:bg-[#3E6AF0] transition">Start a Project →</Link>
-            <Link href="/contact" className="rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-sm font-[600] text-white hover:bg-white/10 transition">Talk to our team</Link>
+            <Link href="/contact?type=new-project" className="rounded-full bg-brand px-6 py-2.5 text-sm font-[700] text-white hover:bg-brand-hover transition">Start a Project →</Link>
+            <Link href="/contact" className="rounded-full border border-line bg-surface-alt px-6 py-2.5 text-sm font-[600] text-ink hover:bg-surface-alt transition">Talk to our team</Link>
           </div>
         </div>
       </section>
       <section className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="grid lg:grid-cols-[1.35fr_0.85fr] gap-8">
           <div className="space-y-6">
-            <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-[#4F7EFF]">BUSINESS PROBLEMS ADDRESSED</h2>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-brand">BUSINESS PROBLEMS ADDRESSED</h2>
               <ul className="mt-4 space-y-2.5">
                 {["iPhone / iPad experience missing or poor","No offline or native performance","App Store release friction","No integration with enterprise systems"].map(t=>(
-                  <li key={t} className="flex gap-3 text-sm leading-6 text-white/70"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#4F7EFF] shrink-0" />{t}</li>
+                  <li key={t} className="flex gap-3 text-sm leading-6 text-ink-secondary"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-brand shrink-0" />{t}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-white/60">CAPABILITIES</h2>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">CAPABILITIES</h2>
               <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
                 {["Native iOS (Swift) and cross-platform","Offline, sync and background tasks","Push notifications and analytics","Enterprise distribution and security","App Store submission and ops","Integration with CRM / ERP / APIs"].map(t=>(
-                  <span key={t} className="rounded-xl border border-white/5 bg-white/[0.03] px-3.5 py-2.5 text-sm text-white/70">{t}</span>
+                  <span key={t} className="rounded-xl border border-line bg-surface-alt px-3.5 py-2.5 text-sm text-ink-secondary">{t}</span>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-white/60">TYPICAL USE CASES</h2>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">TYPICAL USE CASES</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {["Customer iOS apps","iPad field and sales apps","Enterprise iOS suites","Companion apps for platforms"].map(t=>(
-                  <span key={t} className="rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-[500] text-white/60">{t}</span>
+                  <span key={t} className="rounded-full border border-line bg-surface-alt px-3.5 py-1.5 text-xs font-[500] text-ink-secondary">{t}</span>
                 ))}
               </div>
             </div>
           </div>
           <div className="space-y-6">
-            <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-white/60">DELIVERY APPROACH</h2>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">DELIVERY APPROACH</h2>
               <ol className="mt-4 space-y-2.5">
                 {["Choose native vs cross-platform by requirement","Design for iOS patterns and accessibility","Build with API integration","Test, submit and operate"].map((t,i)=>(
-                  <li key={t} className="flex gap-3 text-sm leading-6 text-white/70"><span className="h-6 w-6 rounded-lg bg-white/[0.06] border border-white/10 flex items-center justify-center text-xs font-[700] text-white/70 shrink-0">{i+1}</span>{t}</li>
+                  <li key={t} className="flex gap-3 text-sm leading-6 text-ink-secondary"><span className="h-6 w-6 rounded-lg bg-surface-alt border border-line flex items-center justify-center text-xs font-[700] text-ink-secondary shrink-0">{i+1}</span>{t}</li>
                 ))}
               </ol>
             </div>
-            <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-white/60">TECHNOLOGY APPROACH</h2>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">TECHNOLOGY APPROACH</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {["Swift","SwiftUI","Flutter","React Native"].map(t=>(
-                  <span key={t} className="rounded-full border border-[#4F7EFF]/20 bg-[#4F7EFF]/10 px-3 py-1.5 text-xs font-[600] text-[#8AA8FF]">{t}</span>
+                  <span key={t} className="rounded-full border border-brand-line bg-brand-soft px-3 py-1.5 text-xs font-[600] text-brand">{t}</span>
                 ))}
               </div>
-              <p className="mt-3 text-xs text-white/40">Technology is chosen by requirements, scale and maintainability — only technologies we genuinely support are shown.</p>
+              <p className="mt-3 text-xs text-ink-muted">Technology is chosen by requirements, scale and maintainability — only technologies we genuinely support are shown.</p>
             </div>
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-white/60">RELATED SOLUTIONS</h2>
+            <div className="rounded-2xl border border-line bg-surface-alt p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">RELATED SOLUTIONS</h2>
               <div className="mt-3 flex flex-wrap gap-2">
                 {["Mobile App Development","Product Engineering","SaaS Development"].map(t=>(
-                  <span key={t} className="rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-[500] text-white/60">{t}</span>
+                  <span key={t} className="rounded-full border border-line bg-surface-alt px-3.5 py-1.5 text-xs font-[500] text-ink-secondary">{t}</span>
                 ))}
               </div>
-              <Link href="/solutions" className="mt-4 inline-flex text-xs font-[600] text-[#4F7EFF] hover:text-white">View solutions →</Link>
+              <Link href="/solutions" className="mt-4 inline-flex text-xs font-[600] text-brand hover:text-brand">View solutions →</Link>
             </div>
-            <div className="rounded-2xl border border-white/5 bg-[#0F141E] p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-white/60">FAQ</h2>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">FAQ</h2>
               <div className="mt-4 space-y-4">
                 {[["Do you publish to App Store?","Yes — we handle certificates, signing, review and release."]].map(([q,a])=>(
-                  <div key={q}><div className="text-sm font-[600] text-white">{q}</div><div className="mt-1 text-sm leading-6 text-white/50">{a}</div></div>
+                  <div key={q}><div className="text-sm font-[600] text-ink">{q}</div><div className="mt-1 text-sm leading-6 text-ink-secondary">{a}</div></div>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl bg-[#4F7EFF] p-7 text-white">
+            <div className="rounded-2xl bg-brand p-7 text-white">
               <h3 className="text-sm font-[700]">Build ios development with Nexara?</h3>
               <p className="mt-2 text-sm text-white/80">We start with your business problem — then propose the right technology and delivery model.</p>
-              <Link href="/contact?type=new-project" className="mt-4 inline-flex rounded-full bg-white text-[#070A0F] px-5 py-2.5 text-sm font-[700] hover:bg-white/90 transition">Start a Project →</Link>
+              <Link href="/contact?type=new-project" className="mt-4 inline-flex rounded-full bg-white text-brand px-5 py-2.5 text-sm font-[700] hover:bg-brand-soft transition">Start a Project →</Link>
             </div>
           </div>
         </div>

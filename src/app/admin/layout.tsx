@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Admin — Nexara Global Solutions",
+  title: "Admin",
   description: "Admin area for managing inquiries and careers.",
   robots: { index: false, follow: false, noarchive: true },
 };

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/site-url";
+import { safeDb } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
   const routes = [
     "",
@@ -47,6 +48,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/insights/cloud",
     "/insights/business-automation",
     "/insights/technology-strategy",
+    "/insights/workflow-agents",
+    "/insights/document-intelligence",
     "/insights/ai-automate-workflows",
     "/insights/when-replace-legacy",
     "/insights/crm-vs-custom-platform",
@@ -59,16 +62,36 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/careers/contract-opportunities",
     "/careers/talent-community",
     "/careers/send-resume",
+    "/solution-finder",
     "/contact",
     "/about",
     "/case-studies",
   ];
-  // Job detail pages are dynamic — when DB is available, published slugs would be enumerated here via Prisma.
-  // For now, static list excludes unpublished / fake jobs (honest empty state).
-  return routes.map((r) => ({
+  const staticEntries: MetadataRoute.Sitemap = routes.map((r) => ({
     url: `${base}${r || "/"}`,
     lastModified: new Date(),
     changeFrequency: r === "" ? "weekly" : "monthly",
     priority: r === "" ? 1 : r.includes("/careers") ? 0.6 : r.includes("/insights/") || r.includes("/industries/") || r.includes("/services/") || r.includes("/solutions/") ? 0.6 : 0.7,
   }));
+
+  // Published job detail pages are indexable public URLs — enumerate them when
+  // the database is reachable. safeDb falls back to an empty list otherwise,
+  // so the build never fails on DB availability.
+  const jobs = await safeDb(
+    async (db) =>
+      db.job.findMany({
+        where: { isPublished: true, status: "Published" },
+        select: { slug: true, updatedAt: true },
+      }),
+    [] as { slug: string; updatedAt: Date }[],
+  );
+
+  const jobEntries = jobs.map((job) => ({
+    url: `${base}/careers/job-search/${job.slug}`,
+    lastModified: job.updatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticEntries, ...jobEntries];
 }

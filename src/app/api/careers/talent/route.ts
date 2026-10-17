@@ -1,35 +1,91 @@
-import { NextResponse } from "next/server";
 import { safeDb } from "@/lib/prisma";
+import {
+  asOptionalText,
+  callerIdentity,
+  checkRateLimit,
+  fail,
+  normalizeIdempotencyKey,
+  ok,
+  safeMessage,
+} from "@/lib/intake-server";
+import {
+  checkProfileUrls,
+  forwardCareersWebhook,
+  isCareersWebhookConfigured,
+  isDbConfigured,
+  parseCommonFields,
+  requireConsent,
+  requireEmail,
+  requireName,
+} from "@/lib/careers-server";
 
 export async function POST(req: Request) {
   try {
-    const form = await req.formData();
-    const fullName = String(form.get("fullName") || "").trim();
-    const email = String(form.get("email") || "").trim();
-    const phone = String(form.get("phone") || "").trim();
-    const location = String(form.get("location") || "").trim();
-    const linkedinUrl = String(form.get("linkedinUrl") || "").trim();
-    const portfolioUrl = String(form.get("portfolioUrl") || "").trim();
-    const yearsExperience = String(form.get("yearsExperience") || "").trim();
-    const areaOfInterest = String(form.get("areaOfInterest") || "").trim();
-    const employmentType = String(form.get("employmentType") || "Full-time").trim();
-    const message = String(form.get("message") || "").trim();
-    const consent = form.get("consent");
+    const identity = `careers-talent:${callerIdentity(req)}`;
+    const { limited, retryAfterSec } = checkRateLimit(identity, {
+      limit: 10,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (limited) {
+      const res = fail(429, "Too many submissions. Please wait a few minutes and try again.", {
+        retryAfterSec,
+      });
+      res.headers.set("Retry-After", String(retryAfterSec));
+      return res;
+    }
 
-    if (!fullName || fullName.length < 2) return NextResponse.json({ error: "Full name is required" }, { status: 400 });
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
-    if (!areaOfInterest) return NextResponse.json({ error: "Area of interest is required" }, { status: 400 });
-    if (!consent) return NextResponse.json({ error: "Consent is required" }, { status: 400 });
+    if (!isDbConfigured()) {
+      return fail(
+        503,
+        "Talent intake is unavailable right now. Please try again later or email us directly.",
+        { code: "DB_UNAVAILABLE" },
+      );
+    }
+
+    const form = await req.formData();
+    const fields = parseCommonFields(form);
+    const yearsExperience = asOptionalText(form.get("yearsExperience"), 20);
+    const areaOfInterest = asOptionalText(form.get("areaOfInterest"), 120);
+    const employmentType = asOptionalText(form.get("employmentType"), 40) || "Full-time";
+    const message = asOptionalText(form.get("message"), 8000);
+
+    const nameErr = requireName(fields);
+    if (nameErr) return fail(400, nameErr.message, { field: "fullName" });
+    const emailErr = requireEmail(fields);
+    if (emailErr) return fail(400, emailErr.message, { field: "email" });
+    if (!areaOfInterest) return fail(400, "Area of interest is required", { field: "areaOfInterest" });
+    const urlErr = checkProfileUrls(fields);
+    if (urlErr) return fail(400, urlErr.message, { field: "linkedinUrl" });
+    const consentErr = requireConsent(form);
+    if (consentErr) return fail(400, consentErr.message, { field: "consent" });
+
+    const { key } = normalizeIdempotencyKey(form.get("idempotencyKey"));
 
     const created = await safeDb(async (db) => {
-      return db.talentProfile.create({
-        data: {
-          fullName,
-          email,
-          phone: phone || null,
-          location: location || null,
-          linkedinUrl: linkedinUrl || null,
-          portfolioUrl: portfolioUrl || null,
+      return db.talentProfile.upsert({
+        where: { id: key },
+        update: {
+          fullName: fields.fullName,
+          email: fields.email,
+          phone: fields.phone || null,
+          location: fields.location || null,
+          linkedinUrl: fields.linkedinUrl || null,
+          portfolioUrl: fields.portfolioUrl || null,
+          yearsExperience: yearsExperience || null,
+          areaOfInterest,
+          employmentType,
+          message: message || null,
+          consent: true,
+          status: "New",
+        },
+        create: {
+          id: key,
+          fullName: fields.fullName,
+          email: fields.email,
+          phone: fields.phone || null,
+          location: fields.location || null,
+          linkedinUrl: fields.linkedinUrl || null,
+          portfolioUrl: fields.portfolioUrl || null,
           yearsExperience: yearsExperience || null,
           areaOfInterest,
           employmentType,
@@ -41,12 +97,42 @@ export async function POST(req: Request) {
     }, null as unknown as { id: string });
 
     if (!created) {
-      console.warn("[careers] talent — DB not configured", { email });
-      return NextResponse.json({ ok: true, warning: "DB not configured — not persisted." });
+      return fail(
+        503,
+        "We could not save your profile right now. Please try again later or email us directly.",
+        { code: "DB_UNAVAILABLE" },
+      );
     }
-    return NextResponse.json({ ok: true, id: created.id });
+
+    // Best-effort webhook fan-out — storage already succeeded, so annotate truthfully.
+    let forwarded = false;
+    if (isCareersWebhookConfigured()) {
+      try {
+        await forwardCareersWebhook({
+          type: "talent_profile",
+          id: created.id,
+          fullName: fields.fullName,
+          email: fields.email,
+          phone: fields.phone || null,
+          location: fields.location || null,
+          linkedinUrl: fields.linkedinUrl || null,
+          portfolioUrl: fields.portfolioUrl || null,
+          yearsExperience: yearsExperience || null,
+          areaOfInterest,
+          employmentType,
+          message: message || null,
+          status: "New",
+          createdAt: new Date().toISOString(),
+        });
+        forwarded = true;
+      } catch (e) {
+        console.error("[careers] talent webhook failed", safeMessage(e, "Webhook failed."));
+      }
+    }
+
+    return ok({ id: created.id, forwarded });
   } catch (e) {
     console.error("[careers] talent error", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return fail(500, "Internal error. Please try again.");
   }
 }

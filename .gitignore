@@ -29,6 +29,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
+
+# local runtime data (inquiries, etc.)
+/.data/
 
 # local dev uploads (production uses object storage)
 /public/uploads

@@ -59,12 +59,12 @@ export const statusLabels: Record<InquiryStatus, string> = {
   CLOSED: "Closed",
 };
 export const statusColors: Record<InquiryStatus, string> = {
-  NEW: "bg-[#4F7EFF]/15 text-[#8AA8FF] border-[#4F7EFF]/20",
-  CONTACTED: "bg-amber-500/10 text-amber-300 border-amber-500/20",
+  NEW: "bg-brand-soft text-brand border-brand-line",
+  CONTACTED: "bg-warning-soft text-warning border-amber-500/20",
   IN_DISCUSSION: "bg-cyan-500/10 text-cyan-300 border-cyan-500/20",
   PROPOSAL_SENT: "bg-violet-500/10 text-violet-300 border-violet-500/20",
-  WON: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
-  CLOSED: "bg-white/5 text-white/40 border-white/10",
+  WON: "bg-success-soft text-success border-success-line",
+  CLOSED: "bg-surface-alt text-ink-muted border-line",
 };
 export const serviceOptions = [
   "Custom Software","CRM","ERP","SCM","SaaS","AI Software","Mobile","iOS","Enterprise Software","Cloud & Integration","BPO","Resource Management","Other",

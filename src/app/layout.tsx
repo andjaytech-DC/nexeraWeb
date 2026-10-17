@@ -30,8 +30,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${jakarta.variable} ${mono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#070A0F] text-[#E6EAF0] overflow-x-hidden">
+    <html
+      lang="en"
+      className={`${inter.variable} ${jakarta.variable} ${mono.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col bg-canvas text-ink">
+        <a
+          href="#main"
+          className="sr-only-focusable absolute left-4 top-4 z-[100] rounded-full bg-brand px-5 py-2.5 text-[14px] font-[700] text-white"
+        >
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>
