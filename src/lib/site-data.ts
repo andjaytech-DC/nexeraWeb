@@ -42,8 +42,8 @@ export const industries = [
 export const contactInfo = {
   phoneDisplay: "+91 8882033199",
   phoneHref: "tel:+918882033199",
-  email: "andjaytech@gmail.com",
-  emailHref: "mailto:andjaytech@gmail.com",
+  email: "archanaffrps08aug@gtmail.com",
+  emailHref: "mailto:archanaffrps08aug@gtmail.com",
 } as const;
 
 // Notification routing — read only by the contact intake route, never
