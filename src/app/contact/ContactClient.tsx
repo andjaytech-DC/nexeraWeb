@@ -88,6 +88,7 @@ export default function ContactClient({ initialType }: { initialType?: string })
         error?: string;
         field?: string;
         id?: string;
+        reference?: string;
       } | null;
       if (!res.ok || !data?.ok) {
         const message = data?.error || "Submission failed. Please try again.";
@@ -98,7 +99,7 @@ export default function ContactClient({ initialType }: { initialType?: string })
         return;
       }
       // Success renders only on server confirmation (202 + id).
-      setSubmissionId(typeof data.id === "string" ? data.id : null);
+      setSubmissionId(typeof data.reference === "string" ? data.reference : (typeof data.id === "string" ? data.id : null));
       setIdempotencyKey(
         typeof crypto !== "undefined" && "randomUUID" in crypto
           ? crypto.randomUUID()

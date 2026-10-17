@@ -70,6 +70,7 @@ export async function POST(req: Request) {
 
   // 4. Persist. Any throw → 503 (storage missing or failed). No fake success.
   let id: string;
+  let reference = "";
   try {
     const contactEmail = asOptionalText(process.env.CONTACT_TO_EMAIL, 254);
     const contactName = asOptionalText(process.env.CONTACT_TO_NAME, 120);
@@ -78,6 +79,7 @@ export async function POST(req: Request) {
       { id: key },
     );
     id = record.id;
+    reference = record.reference;
   } catch (e) {
     console.error("[inquiries] storage failed", safeMessage(e, "Storage unavailable."));
     return fail(
@@ -92,14 +94,14 @@ export async function POST(req: Request) {
   let forwarded = false;
   if (isWebhookConfigured()) {
     try {
-      await forwardContactWebhook({ ...fields, id, createdAt: new Date().toISOString() });
+      await forwardContactWebhook({ ...fields, id, reference, createdAt: new Date().toISOString() });
       forwarded = true;
     } catch (e) {
       console.error("[inquiries] webhook failed", safeMessage(e, "Webhook failed."));
     }
   }
 
-  return ok({ id, forwarded });
+  return ok({ id, reference, forwarded });
 }
 
 export async function GET() {

@@ -32,6 +32,7 @@ export interface ContactInput {
 
 export interface ContactRecord extends Omit<ContactInput, "website"> {
   id: string;
+  reference: string;
   createdAt: string;
   /** Optional notification routing, taken from CONTACT_TO_* (server env). */
   toEmail?: string;
@@ -148,7 +149,7 @@ export function isWebhookConfigured(): boolean {
  * key, so retries are idempotent.
  */
 export async function storeContactSubmission(
-  input: Omit<ContactRecord, "id" | "createdAt">,
+  input: Omit<ContactRecord, "id" | "reference" | "createdAt">,
   opts?: { id?: string; now?: string },
 ): Promise<ContactRecord> {
   const id =
@@ -156,8 +157,10 @@ export async function storeContactSubmission(
     (typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID().replace(/-/g, "")
       : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`);
-  const createdAt = opts?.now ?? new Date().toISOString();
-  const record: ContactRecord = { ...input, id, createdAt };
+  const now = new Date();
+  const reference = `INQ/${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}/${String(now.getMinutes()).padStart(2, "0")}/${String(now.getSeconds()).padStart(2, "0")}/${Math.random().toString(16).slice(2, 10).toUpperCase().padStart(8, "0")}`;
+  const createdAt = opts?.now ?? now.toISOString();
+  const record: ContactRecord = { ...input, id, reference, createdAt };
   const payload = JSON.stringify(record, null, 2);
 
   if (isBlobStorageConfigured()) {
