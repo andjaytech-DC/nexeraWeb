@@ -75,7 +75,7 @@ export const projectTypeOptions: string[] = ["New Product","Existing System Mode
 const KEY = "nexara_inquiries_v1";
 function isBrowser() { return typeof window !== "undefined" && typeof localStorage !== "undefined"; }
 function uid() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return (crypto as unknown as { randomUUID: () => string }).randomUUID();
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return (crypto as unknown as { randomUUID: () => string }).randomUUID().replace(/-/g, "");
   return String(Date.now()) + Math.random().toString(36).slice(2);
 }
 

@@ -82,8 +82,8 @@ export function normalizeIdempotencyKey(raw: unknown): { key: string; clientSupp
   }
   const key =
     typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 14)}`;
+      ? crypto.randomUUID().replace(/-/g, "")
+      : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`;
   return { key, clientSupplied: false };
 }
 

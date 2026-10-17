@@ -154,8 +154,8 @@ export async function storeContactSubmission(
   const id =
     opts?.id ??
     (typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 14)}`);
+      ? crypto.randomUUID().replace(/-/g, "")
+      : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`);
   const createdAt = opts?.now ?? new Date().toISOString();
   const record: ContactRecord = { ...input, id, createdAt };
   const payload = JSON.stringify(record, null, 2);
