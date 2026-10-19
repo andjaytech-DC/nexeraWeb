@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { insightCategories } from "@/lib/site-data";
+import { accent, INSIGHT_ACCENTS } from "@/lib/card-accents";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -40,14 +41,20 @@ export default function InsightsPage() {
       </section>
       <section className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {articles.map((a) => (
-            <Link key={a.slug} href={`/insights/${a.slug}`} className="group rounded-2xl border border-line bg-surface p-6 hover:border-line hover:bg-surface-alt transition flex flex-col">
-              <span className="inline-flex self-start rounded-full border border-line bg-surface-alt px-2.5 py-1 text-[11px] font-[700] tracking-[0.08em] text-ink-secondary">{a.cat}</span>
-              <h2 className="mt-4 text-[14px] font-[700] leading-6 text-ink group-hover:text-brand transition flex-1">{a.title}</h2>
-              <p className="mt-2 text-xs text-ink-muted">{a.meta}</p>
-              <span className="mt-4 inline-flex text-xs font-[600] text-ink-muted group-hover:text-brand">Read article →</span>
-            </Link>
-          ))}
+          {articles.map((a) => {
+            const ia = accent(INSIGHT_ACCENTS[a.catSlug]);
+            return (
+              <Link key={a.slug} href={`/insights/${a.slug}`} className={`group rounded-2xl border border-line bg-surface p-6 hover:bg-surface-alt transition flex flex-col ${ia.ring}`}>
+                <span className={`inline-flex self-start items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-[700] tracking-[0.08em] ${ia.chip}`}>
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${ia.dot}`} />
+                  {a.cat}
+                </span>
+                <h2 className="mt-4 text-[14px] font-[700] leading-6 text-ink group-hover:text-brand transition flex-1">{a.title}</h2>
+                <p className="mt-2 text-xs text-ink-muted">{a.meta}</p>
+                <span className="mt-4 inline-flex text-xs font-[600] text-ink-muted group-hover:text-brand">Read article →</span>
+              </Link>
+            );
+          })}
         </div>
         <div className="mt-10 rounded-2xl border border-warning-line bg-warning-soft px-6 py-5">
           <p className="text-xs tracking-[0.12em] font-[700] text-warning">EDITORIAL PLACEHOLDERS</p>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { solutions } from "@/lib/site-data";
+import { accent, SOLUTION_ACCENTS } from "@/lib/card-accents";
 
 export const metadata: Metadata = {
   title: "Solutions",
@@ -30,22 +31,25 @@ export default function SolutionsPage() {
 
       <section className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="grid md:grid-cols-2 gap-5">
-          {solutions.map((s) => (
-            <Link key={s.slug} href={`/solutions/${s.slug}`} className="group rounded-[20px] border border-line bg-surface p-7 hover:border-brand-line hover:bg-surface-alt transition flex flex-col">
+          {solutions.map((s) => {
+            const sa = accent(SOLUTION_ACCENTS[s.slug]);
+            return (
+              <Link key={s.slug} href={`/solutions/${s.slug}`} className={`group rounded-[20px] border border-line bg-surface p-7 hover:bg-surface-alt transition flex flex-col ${sa.ring}`}>
               <div className="flex items-center justify-between">
                 <span className="text-[11px] tracking-[0.14em] font-[700] text-ink-muted">{s.k} — SOLUTION</span>
-                <span className="h-8 w-8 rounded-full border border-line bg-surface-alt flex items-center justify-center text-ink-muted group-hover:text-brand transition">â†—</span>
+                <span className={`h-8 w-8 rounded-full border bg-surface-alt flex items-center justify-center text-ink-muted group-hover:text-brand transition ${sa.ring}`}>â†—</span>
               </div>
               <h2 className="mt-3 text-[18px] font-[700] tracking-[-0.01em] text-ink group-hover:text-brand">{s.title}</h2>
               <p className="mt-2 text-[13px] leading-6 text-ink-secondary flex-1">{s.desc}</p>
               <ul className="mt-4 space-y-1.5">
                 {s.bullets.map((b) => (
-                  <li key={b} className="flex items-center gap-2 text-xs text-ink-secondary"><span className="h-1 w-1 rounded-full bg-brand/70" />{b}</li>
+                  <li key={b} className="flex items-center gap-2 text-xs text-ink-secondary"><span className={`h-1.5 w-1.5 shrink-0 rounded-full ${sa.dot}`} />{b}</li>
                 ))}
               </ul>
               <span className="mt-6 inline-flex text-xs font-[700] tracking-[0.08em] text-brand group-hover:text-brand">EXPLORE SOLUTION â†’</span>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
         <div className="mt-12 rounded-2xl border border-line bg-surface-alt px-6 py-6 flex flex-col lg:flex-row gap-6 justify-between">
           <div>

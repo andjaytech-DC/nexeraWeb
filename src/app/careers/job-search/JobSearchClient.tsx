@@ -6,37 +6,15 @@ type Job = {
   id: string; title: string; slug: string; department: string; location: string; employmentType: string; experienceLevel?: string | null; createdAt: Date;
 };
 
-/* Colorful card accents shared by department. Full literal class strings so
-   the Tailwind compiler picks every variant up; darker tiers stay legible on
-   the dark surface. */
-type Accent = { chip: string; bar: string; ring: string; dot: string };
-const ACCENTS: Record<string, Accent> = {
-  IT: {
-    chip: "border-sky-400/30 bg-sky-400/10 text-sky-300",
-    bar: "bg-gradient-to-b from-sky-400 to-cyan-300",
-    ring: "group-hover:border-sky-400/40",
-    dot: "bg-sky-400",
-  },
-  BPO: {
-    chip: "border-violet-400/30 bg-violet-400/10 text-violet-300",
-    bar: "bg-gradient-to-b from-violet-400 to-fuchsia-300",
-    ring: "group-hover:border-violet-400/40",
-    dot: "bg-violet-400",
-  },
-  HR: {
-    chip: "border-amber-400/30 bg-amber-400/10 text-amber-300",
-    bar: "bg-gradient-to-b from-amber-400 to-orange-300",
-    ring: "group-hover:border-amber-400/40",
-    dot: "bg-amber-400",
-  },
+import { accent } from "@/lib/card-accents";
+
+/* Colorful card accents by department — IT/BPO/HR map into the shared
+   site-wide accent system (src/lib/card-accents.ts). */
+const DEPARTMENT_ACCENTS: Record<string, string> = {
+  IT: "sky",
+  BPO: "violet",
+  HR: "amber",
 };
-const NEUTRAL: Accent = {
-  chip: "border-line bg-surface-alt text-ink-secondary",
-  bar: "bg-gradient-to-b from-brand to-brand-hover",
-  ring: "group-hover:border-brand/40",
-  dot: "bg-brand",
-};
-const accentFor = (department: string): Accent => ACCENTS[department] ?? NEUTRAL;
 
 export default function JobSearchClient({ initialJobs }: { initialJobs: Job[] }) {
   const [q, setQ] = useState("");
@@ -108,7 +86,7 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: Job[] })
 }
 
 function JobCard({ job: j }: { job: Job }) {
-  const a = accentFor(j.department);
+  const a = accent(DEPARTMENT_ACCENTS[j.department]);
   return (
     <Link
       href={`/careers/job-search/${j.slug}`}

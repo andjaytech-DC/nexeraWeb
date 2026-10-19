@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { accent, CAREERS_ACCENTS } from "@/lib/card-accents";
 
 export const metadata: Metadata = {
   title: "Careers — Build What's Next",
@@ -35,13 +36,17 @@ export default function CareersPage() {
             { title: "Contract Opportunities", desc: "Flexible engagements for engineers, designers, QA, mobile, AI, DevOps and operations specialists.", href: "/careers/contract-opportunities", cta: "View contracts â†’" },
             { title: "Talent Community", desc: "Stay connected — tell us your skills and interests for future opportunities.", href: "/careers/talent-community", cta: "Join community â†’" },
             { title: "Send Your Resume", desc: "Don't see the right opening? Share your profile and we'll consider it for relevant roles.", href: "/careers/send-resume", cta: "Send resume â†’" },
-          ].map((c) => (
-            <Link key={c.href} href={c.href} className="group rounded-2xl border border-line bg-surface p-7 hover:border-brand-line hover:bg-surface-alt transition flex flex-col">
-              <h2 className="text-[16px] font-[700] text-ink">{c.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-ink-secondary flex-1">{c.desc}</p>
-              <span className="mt-4 inline-flex text-xs font-[700] tracking-[0.08em] text-brand group-hover:text-brand">{c.cta}</span>
-            </Link>
-          ))}
+          ].map((c) => {
+            const ca = accent(CAREERS_ACCENTS[c.href]);
+            return (
+              <Link key={c.href} href={c.href} className={`group rounded-2xl border border-line bg-surface p-7 hover:bg-surface-alt transition flex flex-col ${ca.ring}`}>
+                <div className={`h-9 w-9 rounded-xl border flex items-center justify-center text-xs font-[700] ${ca.tile}`}>{c.title.slice(0, 2).toUpperCase()}</div>
+                <h2 className="mt-4 text-[16px] font-[700] text-ink">{c.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-ink-secondary flex-1">{c.desc}</p>
+                <span className="mt-4 inline-flex text-xs font-[700] tracking-[0.08em] text-brand group-hover:text-brand">{c.cta}</span>
+              </Link>
+            );
+          })}
         </div>
 
         <div className="mt-10 rounded-2xl border border-line bg-surface p-7 grid lg:grid-cols-2 gap-6">
