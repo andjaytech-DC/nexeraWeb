@@ -1,5 +1,6 @@
 import type { Job, JobApplication } from "@prisma/client";
 import { safeDb } from "@/lib/prisma";
+import { StatusSelect } from "./StatusSelect";
 
 type ApplicationRow = JobApplication & { job: Job };
 
@@ -28,7 +29,7 @@ export default async function AdminApplicationsPage() {
                     <td className="px-4 py-3 text-white/60">{a.email}</td>
                     <td className="px-4 py-3">{a.resumeUrl ? <a href={`/api/admin/resumes?url=${encodeURIComponent(a.resumeUrl)}`} className="text-[#4F7EFF] hover:text-white" title={a.resumeName || "Resume"}>Download</a> : <span className="text-white/30">—</span>}</td>
                     <td className="px-4 py-3 text-xs text-white/40">{new Date(a.createdAt).toLocaleString()}</td>
-                    <td className="px-4 py-3"><span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs">{a.status}</span></td>
+                    <td className="px-4 py-3"><StatusSelect id={a.id} status={a.status} /></td>
                   </tr>
                 ))
               )}

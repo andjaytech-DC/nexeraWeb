@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
 
         <button
           type="submit"
-          disabled={busy || password.length === 0}
+          disabled={busy}
           className="mt-6 w-full rounded-full bg-white px-4 py-3 text-sm font-[700] text-[#070A0F] disabled:opacity-50"
         >
           {busy ? "Signing in…" : "Sign in"}

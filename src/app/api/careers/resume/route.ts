@@ -15,6 +15,7 @@ import {
   isCareersWebhookConfigured,
   isDbConfigured,
   parseCommonFields,
+  storeTalentProfile,
   requireConsent,
   requireEmail,
   requireName,
@@ -33,15 +34,6 @@ export async function POST(req: Request) {
       });
       res.headers.set("Retry-After", String(retryAfterSec));
       return res;
-    }
-
-    if (!isDbConfigured()) {
-      // Records cannot be persisted without a database — reject truthfully.
-      return fail(
-        503,
-        "Resume intake is unavailable right now. Please try again later or email us directly.",
-        { code: "DB_UNAVAILABLE" },
-      );
     }
 
     const form = await req.formData();
@@ -85,35 +77,69 @@ export async function POST(req: Request) {
       );
     }
 
-    const created = await safeDb(async (db) => {
-      return db.talentProfile.upsert({
-        where: { id: key },
-        update: {
-          fullName: fields.fullName,
-          email: fields.email,
-          phone: fields.phone,
-          location,
-          linkedinUrl: fields.linkedinUrl || null,
-          portfolioUrl: fields.portfolioUrl || null,
-          yearsExperience,
-          areaOfInterest,
-          employmentType,
-          resumeUrl: stored.url,
-          resumeName: stored.name,
-          resumeType: stored.type,
-          resumeSize: stored.size,
-          message: message || null,
-          consent: true,
-          status: "New",
-        },
-        create: {
+    let created: { id: string };
+    if (isDbConfigured()) {
+      const dbCreated = await safeDb(async (db) => {
+        return db.talentProfile.upsert({
+          where: { id: key },
+          update: {
+            fullName: fields.fullName,
+            email: fields.email,
+            phone: fields.phone,
+            location,
+            linkedinUrl: fields.linkedinUrl || null,
+            portfolioUrl: fields.portfolioUrl || null,
+            yearsExperience,
+            areaOfInterest,
+            employmentType,
+            resumeUrl: stored.url,
+            resumeName: stored.name,
+            resumeType: stored.type,
+            resumeSize: stored.size,
+            message: message || null,
+            consent: true,
+            status: "New",
+          },
+          create: {
+            id: key,
+            fullName: fields.fullName,
+            email: fields.email,
+            phone: fields.phone,
+            location,
+            linkedinUrl: fields.linkedinUrl || null,
+            portfolioUrl: fields.portfolioUrl || null,
+            yearsExperience,
+            areaOfInterest,
+            employmentType,
+            resumeUrl: stored.url,
+            resumeName: stored.name,
+            resumeType: stored.type,
+            resumeSize: stored.size,
+            message: message || null,
+            consent: true,
+            status: "New",
+          },
+        });
+      }, null as unknown as { id: string });
+
+      if (!dbCreated) {
+        return fail(
+          503,
+          "We could not save your profile right now. Please try again later or email us directly.",
+          { code: "DB_UNAVAILABLE" },
+        );
+      }
+      created = dbCreated;
+    } else {
+      try {
+        const profile = await storeTalentProfile({
           id: key,
           fullName: fields.fullName,
           email: fields.email,
           phone: fields.phone,
           location,
-          linkedinUrl: fields.linkedinUrl || null,
-          portfolioUrl: fields.portfolioUrl || null,
+          linkedinUrl: fields.linkedinUrl || "",
+          portfolioUrl: fields.portfolioUrl || "",
           yearsExperience,
           areaOfInterest,
           employmentType,
@@ -124,16 +150,16 @@ export async function POST(req: Request) {
           message: message || null,
           consent: true,
           status: "New",
-        },
-      });
-    }, null as unknown as { id: string });
-
-    if (!created) {
-      return fail(
-        503,
-        "We could not save your profile right now. Please try again later or email us directly.",
-        { code: "DB_UNAVAILABLE" },
-      );
+        });
+        created = { id: profile.id };
+      } catch (e) {
+        console.error("[careers] talent profile storage failed", safeMessage(e, "Storage unavailable."));
+        return fail(
+          503,
+          "Resume storage is unavailable right now. Please try again later or email us directly.",
+          { code: "STORAGE_UNAVAILABLE" },
+        );
+      }
     }
 
     // Best-effort webhook fan-out — storage already succeeded, so annotate truthfully.

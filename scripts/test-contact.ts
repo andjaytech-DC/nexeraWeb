@@ -64,7 +64,7 @@ check("validateContact accepts a complete valid submission", validateContact(val
 check(
   "validateContact rejects empty name",
   validateContact(validPayload({ name: "  " })).ok === false &&
-    (validateContact(validPayload({ name: "  " })) as any).error.field === "name",
+    (validateContact(validPayload({ name: "  " })) as { ok: false; error: { field: string } }).error.field === "name",
 );
 check(
   "validateContact rejects invalid email",
@@ -83,13 +83,13 @@ check(
   "validateContact sanitises over-length fields",
   (() => {
     const r = validateContact(validPayload({ name: "A".repeat(300) }));
-    return r.ok === true && (r as any).value.name.length <= 120;
+    return r.ok === true && (r as { ok: true; value: { name: string } }).value.name.length <= 120;
   })(),
 );
 check(
   "validateContact normalises optional fields to safe labels",
   validateContact(validPayload({ service: "nope", preferredContact: "Whatsapp" })).ok === true &&
-    (validateContact(validPayload({ service: "nope", preferredContact: "Whatsapp" })) as any).value.service === "Other",
+    (validateContact(validPayload({ service: "nope", preferredContact: "Whatsapp" })) as { ok: true; value: { service: string } }).value.service === "Other",
 );
 
 // ── standalone helpers ────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ srv.listen(0, "127.0.0.1", () => {
     name: "Jane Doe", email: "jane@example.com", service: "CRM",
     projectType: "New Product", description: "A CRM request", preferredContact: "Email",
     idempotencyKey: "webhook-test-1",
-  } as any).then(() => {
+  } as never).then(() => {
     // forwardContactWebhook only resolves when the webhook returns 2xx.
     // If we got here, the server accepted the POST.
     console.log("  PASS  forwardContactWebhook POSTs the record");
@@ -148,7 +148,7 @@ srv.listen(0, "127.0.0.1", () => {
       const errorPort = (errorSrv.address() as { port: number }).port;
       const before2 = process.env.CONTACT_WEBHOOK_URL;
       process.env.CONTACT_WEBHOOK_URL = `http://127.0.0.1:${errorPort}/error`;
-      forwardContactWebhook({ name: "Jane Doe", email: "jane@example.com", service: "CRM", projectType: "New Product", description: "A CRM request", preferredContact: "Email", idempotencyKey: "webhook-error-1" } as any).then(
+      forwardContactWebhook({ name: "Jane Doe", email: "jane@example.com", service: "CRM", projectType: "New Product", description: "A CRM request", preferredContact: "Email", idempotencyKey: "webhook-error-1" } as never).then(
         () => {
           console.log("  FAIL  forwardContactWebhook rejects non-2xx responses");
           failures++;
@@ -156,8 +156,8 @@ srv.listen(0, "127.0.0.1", () => {
           errorSrv.close();
           finish();
         },
-        (e: any) => {
-          const passed = /^[1-5]/.test(e.status || "") === false;
+        (e: unknown) => {
+          const passed = /^[1-5]/.test((e as { status?: string }).status || "") === false;
           console.log(`  ${passed ? "PASS" : "FAIL"}  forwardContactWebhook rejects non-2xx responses`);
           if (!passed) failures++;
           process.env.CONTACT_WEBHOOK_URL = before2;
@@ -166,7 +166,7 @@ srv.listen(0, "127.0.0.1", () => {
         }
       );
     });
-  }).catch((e: any) => {
+  }).catch((e: unknown) => {
     console.log("  FAIL  forwardContactWebhook POSTs the record (threw)");
     failures++;
     process.env.CONTACT_WEBHOOK_URL = before1;

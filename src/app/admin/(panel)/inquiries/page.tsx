@@ -31,6 +31,13 @@ export default function InquiriesPage() {
         <h1 className="text-[24px] font-[800] tracking-[-0.03em]">Inquiries</h1>
         <div className="flex flex-wrap gap-3 items-center">
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, company, email, service…" className="w-[260px] rounded-xl border border-white/10 bg-[#0F141E] px-3.5 py-2 text-sm text-white placeholder:text-white/30 focus:border-[#4F7EFF]/50 focus:outline-none" />
+          <button onClick={() => {
+            const rows = [["Name","Company","Email","Service","Project Type","Status","Submitted"], ...filtered.map(i => [i.name,i.company,i.email,i.service,i.projectType,i.status,new Date(i.createdAt).toISOString()])];
+            const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.href = url; a.download = "inquiries.csv"; a.click(); URL.revokeObjectURL(url);
+          }} className="rounded-xl border border-white/10 bg-[#0F141E] px-3.5 py-2 text-sm text-white hover:border-brand">Export CSV</button>
           <select value={filter} onChange={(e) => setFilter(e.target.value as unknown as InquiryStatus | "ALL")} className="rounded-xl border border-white/10 bg-[#0F141E] px-3.5 py-2 text-sm text-white">
             <option value="ALL">All statuses</option>
             {Object.keys(statusLabels).map((s) => <option key={s} value={s}>{statusLabels[s as InquiryStatus]}</option>)}

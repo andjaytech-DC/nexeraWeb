@@ -1,8 +1,14 @@
 import type { TalentProfile } from "@prisma/client";
 import { safeDb } from "@/lib/prisma";
+import { isDbConfigured } from "@/lib/careers-server";
+import { listTalentProfiles, type TalentProfileRecord } from "@/lib/careers-server";
 
 export default async function AdminTalentPage() {
-  const profiles = await safeDb(async (db) => db.talentProfile.findMany({ orderBy: { createdAt: "desc" }, take: 100 }), [] as TalentProfile[]);
+  const dbProfiles = isDbConfigured()
+    ? await safeDb(async (db) => db.talentProfile.findMany({ orderBy: { createdAt: "desc" }, take: 100 }), [] as TalentProfile[])
+    : [];
+  const fileProfiles = isDbConfigured() ? [] : await listTalentProfiles();
+  const profiles = (isDbConfigured() ? dbProfiles : fileProfiles) as Array<TalentProfile | TalentProfileRecord>;
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 py-8">
