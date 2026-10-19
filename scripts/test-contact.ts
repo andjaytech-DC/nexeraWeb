@@ -112,7 +112,10 @@ check("isBlobStorageConfigured() is false without credentials", !isBlobStorageCo
 // ── webhook fan-out (needs a local HTTP server) ───────────────────────────
 
 let webhookPort = 0;
-let serverClose: (() => void) | null = null;
+// Every HTTP server used by tests is tracked here so the process exits only
+// after all of them have fully closed (see finish()).
+const openServers: http.Server[] = [];
+let exiting = false;
 let webhookReceived: unknown = null;
 
 const srv = http.createServer((req, res) => {
@@ -120,12 +123,15 @@ const srv = http.createServer((req, res) => {
   req.on("data", (c) => (buf += c));
   req.on("end", () => {
     try { webhookReceived = JSON.parse(buf); } catch { webhookReceived = buf; }
+    // Connection: close — prevents pooled keep-alive client sockets from
+    // being mid-close when the process exits (libuv assertion on Windows).
+    res.setHeader("Connection", "close");
     res.writeHead(200); res.end("ok");
   });
 });
 srv.listen(0, "127.0.0.1", () => {
   webhookPort = (srv.address() as { port: number }).port;
-  serverClose = () => srv.close();
+  openServers.push(srv);
 
   // Start the webhook tests once the server is listening.
   const before1 = process.env.CONTACT_WEBHOOK_URL;
@@ -142,8 +148,10 @@ srv.listen(0, "127.0.0.1", () => {
 
     // Second test: non-2xx response
     const errorSrv = http.createServer((req, res) => {
+      res.setHeader("Connection", "close");
       res.writeHead(500); res.end("boom");
     });
+    openServers.push(errorSrv);
     errorSrv.listen(0, "127.0.0.1", () => {
       const errorPort = (errorSrv.address() as { port: number }).port;
       const before2 = process.env.CONTACT_WEBHOOK_URL;
@@ -153,7 +161,6 @@ srv.listen(0, "127.0.0.1", () => {
           console.log("  FAIL  forwardContactWebhook rejects non-2xx responses");
           failures++;
           process.env.CONTACT_WEBHOOK_URL = before2;
-          errorSrv.close();
           partDone();
         },
         (e: unknown) => {
@@ -161,7 +168,6 @@ srv.listen(0, "127.0.0.1", () => {
           console.log(`  ${passed ? "PASS" : "FAIL"}  forwardContactWebhook rejects non-2xx responses`);
           if (!passed) failures++;
           process.env.CONTACT_WEBHOOK_URL = before2;
-          errorSrv.close();
           partDone();
         }
       );
@@ -204,11 +210,23 @@ function partDone() {
 }
 
 function finish() {
+  if (exiting) return;
+  exiting = true;
   console.log(failures === 0 ? "\nAll contact server tests passed." : `\n${failures} contact server test(s) failed.`);
-  if (serverClose) serverClose();
-  // Exit on the next tick so closing server handles finish first — exiting
-  // mid-close trips a libuv assertion on Windows even when all tests pass.
-  setTimeout(() => process.exit(failures === 0 ? 0 : 1), 200);
+  process.exitCode = failures === 0 ? 0 : 1;
+  // Let the loop drain naturally: close every test server, hint the guard
+  // timer below, and let Node end itself with process.exitCode. Forcing
+  // process.exit while a handle is mid-close trips a libuv assertion on
+  // Windows (0xC0000409) even when all checks pass. If the process has not
+  // drained within 10s (a handle we failed to close), log and bail out.
+  const guard = setTimeout(() => {
+    console.error("test-contact: process did not drain within 10s — forcing exit.");
+    process.exit(process.exitCode ?? 1);
+  }, 10000);
+  guard.unref();
+  for (const s of openServers) {
+    try { s.close(() => { /* ignore */ }); } catch { /* already closed */ }
+  }
 }
 
 (function runEmailTests() {
@@ -268,23 +286,25 @@ function startEmailWebhook(): Promise<void> {
           } catch {
             check("email webhook receives inquiry payload", false);
           }
+          res.setHeader("Connection", "close");
           res.writeHead(200);
           res.end();
         });
       } else {
+        res.setHeader("Connection", "close");
         res.writeHead(500);
         res.end();
       }
     });
     esrv.listen(0, "127.0.0.1", () => {
       const port = (esrv.address() as { port: number }).port;
+      openServers.push(esrv);
       process.env.EMAIL_WEBHOOK_URL = `http://127.0.0.1:${port}/ok`;
       sendInquiryNotification(emailInput).then((r) => {
         check("email webhook 2xx → sent=true", r.sent === true);
         process.env.EMAIL_WEBHOOK_URL = `http://127.0.0.1:${port}/error`;
         sendInquiryNotification(emailInput).then((r2) => {
           check("email webhook 5xx → sent=false (truthful)", r2.sent === false);
-          esrv.close();
           resolve();
         });
       });
