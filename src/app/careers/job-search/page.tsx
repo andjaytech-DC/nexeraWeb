@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { safeDb } from "@/lib/prisma";
+import { safeDb, isDbConfigured } from "@/lib/prisma";
+import { BUILTIN_JOBS, BUILTIN_LISTED_AT } from "@/lib/job-data";
 import JobSearchClient from "./JobSearchClient";
 
 type JobListItem = {
@@ -16,6 +17,20 @@ type JobListItem = {
   createdAt: Date;
 };
 
+/** The same approved listings rendered without a database (email-only intake). */
+function builtinListItems(): JobListItem[] {
+  return BUILTIN_JOBS.map((j) => ({
+    id: `builtin:${j.slug}`,
+    title: j.title,
+    slug: j.slug,
+    department: j.department,
+    location: j.location,
+    employmentType: j.employmentType,
+    experienceLevel: j.experienceLevel,
+    createdAt: BUILTIN_LISTED_AT,
+  }));
+}
+
 export const metadata: Metadata = {
   title: "Job Search — Careers",
   description: "Search open positions at Nexara Global Solutions by title, keyword, location, department, employment type and experience.",
@@ -28,13 +43,19 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function JobSearchPage() {
-  const jobs = await safeDb(async (db) => {
-    return db.job.findMany({
-      where: { isPublished: true, status: "Published" },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, title: true, slug: true, department: true, location: true, employmentType: true, experienceLevel: true, createdAt: true },
-    });
-  }, [] as JobListItem[]);
+  // Database rows are authoritative whenever a real DATABASE_URL exists —
+  // that keeps admin publish/unpublish/close decisions final. Only when no
+  // database is configured at all do the approved built-in listings take
+  // over, so openings are visible with Apply-by-Email intake from day one.
+  const jobs: JobListItem[] = isDbConfigured()
+    ? await safeDb(async (db) => {
+        return db.job.findMany({
+          where: { isPublished: true, status: "Published" },
+          orderBy: { createdAt: "desc" },
+          select: { id: true, title: true, slug: true, department: true, location: true, employmentType: true, experienceLevel: true, createdAt: true },
+        });
+      }, [] as JobListItem[])
+    : builtinListItems();
 
   return (
     <div className="bg-canvas text-ink">

@@ -5,12 +5,48 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { siteUrl } from "@/lib/site-url";
 import { contactInfo } from "@/lib/site-data";
-import { safeDb } from "@/lib/prisma";
+import { safeDb, isDbConfigured } from "@/lib/prisma";
+import { BUILTIN_APPLY_EMAIL, BUILTIN_JOBS, BUILTIN_LISTED_AT, type BuiltinJob } from "@/lib/job-data";
 import JobApplyForm from "./JobApplyForm";
+
+/** DB job when configured, otherwise the matching approved built-in listing. */
+async function getJobOrBuiltin(slug: string): Promise<{ job: Job | null; fromDb: boolean }> {
+  if (!isDbConfigured()) {
+    const builtin = BUILTIN_JOBS.find((j) => j.slug === slug);
+    return { job: builtin ? builtinToJob(builtin) : null, fromDb: false };
+  }
+  const dbJob = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
+  return { job: dbJob, fromDb: true };
+}
+
+/** Shapes a built-in listing as a Job so the detail page needs one render path. */
+function builtinToJob(j: BuiltinJob): Job {
+  return {
+    id: `builtin:${j.slug}`,
+    title: j.title,
+    slug: j.slug,
+    department: j.department,
+    location: j.location,
+    employmentType: j.employmentType,
+    experienceLevel: j.experienceLevel,
+    description: j.description,
+    responsibilities: j.responsibilities,
+    requirements: j.requirements,
+    preferredSkills: j.preferredSkills,
+    applyEmail: BUILTIN_APPLY_EMAIL,
+    workMode: j.workMode,
+    shiftInfo: j.shiftInfo,
+    status: "Published",
+    isPublished: true,
+    createdAt: BUILTIN_LISTED_AT,
+    updatedAt: BUILTIN_LISTED_AT,
+    applications: [],
+  } as unknown as Job;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
+  const { job } = await getJobOrBuiltin(slug);
   if (!job || !job.isPublished || job.status !== "Published") return { title: "Job", robots: { index: false } };
   return {
     title: job.title,
@@ -22,7 +58,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function JobDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
+  const { job, fromDb } = await getJobOrBuiltin(slug);
 
   if (!job || !job.isPublished || job.status !== "Published") {
     return (
@@ -137,14 +173,24 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         <div className="space-y-6 lg:sticky lg:top-[84px] self-start">
           <div className="rounded-2xl border border-line bg-surface p-7">
             <h3 className="text-xs tracking-[0.12em] font-[700] text-ink-muted">HOW TO APPLY</h3>
-            <p className="mt-2 text-sm leading-6 text-ink-secondary">
-              Apply with the form below, or email us your CV/resume directly — applications from either route reach the same inbox.
-            </p>
+            {fromDb ? (
+              <p className="mt-2 text-sm leading-6 text-ink-secondary">
+                Apply with the form below, or email us your CV/resume directly — applications from either route reach the same inbox.
+              </p>
+            ) : (
+              <p className="mt-2 text-sm leading-6 text-ink-secondary">
+                Email us your CV/resume using the button below — it opens a pre-filled application for this role. Your application lands in our hiring inbox directly.
+              </p>
+            )}
           </div>
-          <JobApplyForm jobId={job.id} jobTitle={job.title} />
+          {fromDb && <JobApplyForm jobId={job.id} jobTitle={job.title} />}
           <a
             href={`mailto:${applyEmail}?subject=${encodeURIComponent(applySubject)}&body=${encodeURIComponent(applyBody)}`}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface-alt px-6 py-3 text-sm font-[700] text-ink transition hover:border-brand hover:text-brand"
+            className={
+              fromDb
+                ? "flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface-alt px-6 py-3 text-sm font-[700] text-ink transition hover:border-brand hover:text-brand"
+                : "flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-[700] text-white transition hover:bg-brand-hover"
+            }
           >
             Apply by Email <span aria-hidden>→</span>
             <span className="sr-only"> for {job.title}</span>

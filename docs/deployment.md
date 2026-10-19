@@ -108,6 +108,12 @@ The schema is additive so far; `db push` migrations have not dropped data.
   `JOBS_APPLY_EMAIL` (default `jay.nexara@gmail.com`, the monitored inbox).
   Per-job overrides are editable in the admin panel.
 - Without a real `DATABASE_URL` the seed refuses to run (truthful guard).
+- **No-database fallback:** the same listings also render publicly from
+  `src/lib/job-data.ts` while `DATABASE_URL` is unconfigured, with
+  Apply-by-Email as the only intake (the web application form needs a
+  database/Blob store). Once the database is configured, it is authoritative:
+  admin publish/unpublish/close decisions always win, and these built-ins
+  stop rendering.
 
 ## 5. Post-deploy smoke test
 

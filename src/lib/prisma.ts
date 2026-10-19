@@ -29,10 +29,17 @@ if (process.env.NODE_ENV !== "production" && (prisma as unknown as { $connect?: 
   (globalForPrisma as unknown as Record<string, unknown>).prisma = prisma;
 }
 
+// Whether a real database can be reached at all — placeholders and missing
+// URLs are "not configured". Careers uses this to decide between database
+// content and the built-in no-database listing fallback (src/lib/job-data.ts).
+export function isDbConfigured(): boolean {
+  const url = process.env.DATABASE_URL ?? "";
+  return Boolean(url) && !url.includes("user:password");
+}
+
 // Helper to safely execute DB ops — returns fallback if DB unavailable
 export async function safeDb<T>(fn: (db: PrismaClient) => Promise<T>, fallback: T): Promise<T> {
-  const url = process.env.DATABASE_URL;
-  if (!url || url.includes("user:password")) {
+  if (!isDbConfigured()) {
     return fallback;
   }
   try {

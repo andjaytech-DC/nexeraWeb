@@ -6,6 +6,38 @@ type Job = {
   id: string; title: string; slug: string; department: string; location: string; employmentType: string; experienceLevel?: string | null; createdAt: Date;
 };
 
+/* Colorful card accents shared by department. Full literal class strings so
+   the Tailwind compiler picks every variant up; darker tiers stay legible on
+   the dark surface. */
+type Accent = { chip: string; bar: string; ring: string; dot: string };
+const ACCENTS: Record<string, Accent> = {
+  IT: {
+    chip: "border-sky-400/30 bg-sky-400/10 text-sky-300",
+    bar: "bg-gradient-to-b from-sky-400 to-cyan-300",
+    ring: "group-hover:border-sky-400/40",
+    dot: "bg-sky-400",
+  },
+  BPO: {
+    chip: "border-violet-400/30 bg-violet-400/10 text-violet-300",
+    bar: "bg-gradient-to-b from-violet-400 to-fuchsia-300",
+    ring: "group-hover:border-violet-400/40",
+    dot: "bg-violet-400",
+  },
+  HR: {
+    chip: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+    bar: "bg-gradient-to-b from-amber-400 to-orange-300",
+    ring: "group-hover:border-amber-400/40",
+    dot: "bg-amber-400",
+  },
+};
+const NEUTRAL: Accent = {
+  chip: "border-line bg-surface-alt text-ink-secondary",
+  bar: "bg-gradient-to-b from-brand to-brand-hover",
+  ring: "group-hover:border-brand/40",
+  dot: "bg-brand",
+};
+const accentFor = (department: string): Accent => ACCENTS[department] ?? NEUTRAL;
+
 export default function JobSearchClient({ initialJobs }: { initialJobs: Job[] }) {
   const [q, setQ] = useState("");
   const [dept, setDept] = useState("All");
@@ -67,23 +99,39 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: Job[] })
           <p className="mt-3 text-xs text-ink-muted">When real vacancies become available, they will appear here with full details.</p>
         </div>
       ) : (
-        <div className="mt-8 grid gap-4">
-          {filtered.map(j=>(
-            <Link key={j.id} href={`/careers/job-search/${j.slug}`} className="group rounded-2xl border border-line bg-surface p-6 hover:border-brand-line hover:bg-surface-alt transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-[16px] font-[700] text-ink group-hover:text-brand transition">{j.title}</h3>
-                <div className="mt-1 flex flex-wrap gap-2 text-xs text-ink-secondary">
-                  <span className="rounded-full border border-line bg-surface-alt px-2.5 py-1">{j.department}</span>
-                  <span className="rounded-full border border-line bg-surface-alt px-2.5 py-1">{j.location}</span>
-                  <span className="rounded-full border border-line bg-surface-alt px-2.5 py-1">{j.employmentType}</span>
-                  {j.experienceLevel && <span className="rounded-full border border-line bg-surface-alt px-2.5 py-1">{j.experienceLevel}</span>}
-                </div>
-              </div>
-              <span className="shrink-0 inline-flex items-center gap-2 rounded-full border border-line bg-surface-alt px-4 py-2 text-sm font-[600] text-ink-secondary group-hover:text-brand group-hover:border-line-strong transition">View details →</span>
-            </Link>
-          ))}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {filtered.map(j => <JobCard key={j.id} job={j} />)}
         </div>
       )}
     </section>
+  );
+}
+
+function JobCard({ job: j }: { job: Job }) {
+  const a = accentFor(j.department);
+  return (
+    <Link
+      href={`/careers/job-search/${j.slug}`}
+      className={`group relative overflow-hidden rounded-2xl border border-line bg-surface p-6 pl-7 transition hover:bg-surface-alt ${a.ring} flex flex-col gap-4 hover:-translate-y-0.5 motion-reduce:hover:translate-y-0`}
+    >
+      <span aria-hidden className={`absolute inset-y-0 left-0 w-[5px] opacity-80 transition group-hover:w-[7px] motion-reduce:group-hover:w-[5px] motion-reduce:transition-none ${a.bar}`} />
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-[700] ${a.chip}`}>
+          <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${a.dot}`} />
+          {j.department}
+        </span>
+        <span className="rounded-full border border-line bg-surface-alt px-2.5 py-1 text-xs text-ink-secondary">{j.employmentType}</span>
+      </div>
+      <div className="flex-1">
+        <h3 className="text-[17px] font-[700] leading-snug text-ink transition group-hover:text-brand">{j.title}</h3>
+        <div className="mt-2.5 flex flex-wrap gap-2 text-xs text-ink-secondary">
+          <span className="inline-flex items-center gap-1.5"><span aria-hidden className="text-ink-muted">◎</span>{j.location}</span>
+          {j.experienceLevel && <><span aria-hidden className="text-ink-muted">·</span><span>{j.experienceLevel}</span></>}
+        </div>
+      </div>
+      <span className="inline-flex items-center gap-2 self-start rounded-full border border-line bg-surface-alt px-4 py-2 text-sm font-[600] text-ink-secondary transition group-hover:border-brand/40 group-hover:text-brand">
+        Apply now <span aria-hidden className="transition group-hover:translate-x-0.5 motion-reduce:group-hover:translate-x-0">→</span>
+      </span>
+    </Link>
   );
 }
