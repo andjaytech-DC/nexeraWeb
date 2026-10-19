@@ -6,17 +6,22 @@ import { Footer } from "@/components/Footer";
 import { siteUrl } from "@/lib/site-url";
 import { contactInfo } from "@/lib/site-data";
 import { safeDb, isDbConfigured } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 import { BUILTIN_APPLY_EMAIL, BUILTIN_JOBS, BUILTIN_LISTED_AT, type BuiltinJob } from "@/lib/job-data";
 import JobApplyForm from "./JobApplyForm";
 
-/** DB job when configured, otherwise the matching approved built-in listing. */
-async function getJobOrBuiltin(slug: string): Promise<{ job: Job | null; fromDb: boolean }> {
+/** DB job when configured, otherwise the matching approved built-in listing.
+ *  `missing` is true only when no published built-in and no DB row exists —
+ *  the page then renders a true 404 instead of a soft not-available screen. */
+async function getJobOrBuiltin(slug: string): Promise<{ job: Job | null; fromDb: boolean; missing: boolean }> {
   if (!isDbConfigured()) {
     const builtin = BUILTIN_JOBS.find((j) => j.slug === slug);
-    return { job: builtin ? builtinToJob(builtin) : null, fromDb: false };
+    return { job: builtin ? builtinToJob(builtin) : null, fromDb: false, missing: !builtin };
   }
   const dbJob = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
-  return { job: dbJob, fromDb: true };
+  // A DB row exists but is unpublished → "hidden" intent → not-available
+  // screen (never leak which slugs exist). No row at all → missing.
+  return { job: dbJob, fromDb: true, missing: !dbJob };
 }
 
 /** Shapes a built-in listing as a Job so the detail page needs one render path. */
@@ -58,7 +63,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function JobDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { job, fromDb } = await getJobOrBuiltin(slug);
+  const { job, fromDb, missing } = await getJobOrBuiltin(slug);
+  if (!job && missing) notFound();
 
   if (!job || !job.isPublished || job.status !== "Published") {
     return (

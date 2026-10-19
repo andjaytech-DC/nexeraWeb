@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/site-url";
-import { safeDb } from "@/lib/prisma";
+import { safeDb, isDbConfigured } from "@/lib/prisma";
+import { BUILTIN_JOBS, BUILTIN_LISTED_AT } from "@/lib/job-data";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
@@ -78,24 +79,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: r === "" ? 1 : r.includes("/careers") ? 0.6 : r.includes("/insights/") || r.includes("/industries/") || r.includes("/services/") || r.includes("/solutions/") ? 0.6 : 0.7,
   }));
 
-  // Published job detail pages are indexable public URLs — enumerate them when
-  // the database is reachable. safeDb falls back to an empty list otherwise,
-  // so the build never fails on DB availability.
-  const jobs = await safeDb(
-    async (db) =>
-      db.job.findMany({
-        where: { isPublished: true, status: "Published" },
-        select: { slug: true, updatedAt: true },
-      }),
-    [] as { slug: string; updatedAt: Date }[],
-  );
+  const dbConfigured = isDbConfigured();
+  const jobs = dbConfigured
+    ? await safeDb(
+        async (db) =>
+          db.job.findMany({
+            where: { isPublished: true, status: "Published" },
+            select: { slug: true, updatedAt: true },
+          }),
+        [] as { slug: string; updatedAt: Date }[],
+      )
+    : [];
 
-  const jobEntries = jobs.map((job) => ({
-    url: `${base}/careers/job-search/${job.slug}`,
-    lastModified: job.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
+  // Database rows are authoritative. Only while no database is configured do
+  // the approved built-in listings (which the public pages render as a
+  // fallback) appear here — so the sitemap always reflects what the site
+  // actually serves.
+  const jobEntries = (jobs.length > 0
+    ? jobs.map((job) => ({ url: `${base}/careers/job-search/${job.slug}`, lastModified: job.updatedAt }))
+    : dbConfigured
+      ? []
+      : BUILTIN_JOBS.map((job) => ({ url: `${base}/careers/job-search/${job.slug}`, lastModified: BUILTIN_LISTED_AT }))
+  ).map((e) => ({ ...e, changeFrequency: "weekly" as const, priority: 0.6 }));
 
   return [...staticEntries, ...jobEntries];
 }
