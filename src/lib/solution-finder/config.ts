@@ -287,6 +287,34 @@ export const serviceCatalog: Record<string, ServiceDef> = {
     ],
     solutions: ["product-engineering"],
   },
+  "website-development": {
+    slug: "website-development",
+    title: "Website Design & Development",
+    short: "Corporate, B2B lead-generation and B2C e-commerce websites, built to convert.",
+    summary:
+      "Websites planned around your business model — corporate presence, B2B lead generation, B2C storefronts and booking flows — with SEO and analytics built in.",
+    capabilities: [
+      "Corporate and business websites",
+      "E-commerce and booking flows",
+      "CMS-driven and multilingual content",
+      "SEO, performance and analytics",
+    ],
+    solutions: ["product-engineering", "digital-transformation"],
+  },
+  "web-app-development": {
+    slug: "web-app-development",
+    title: "Custom Web Applications",
+    short: "Portals, dashboards, booking systems and custom business applications.",
+    summary:
+      "Custom business applications built around your workflow — portals, dashboards and integrations that replace spreadsheets and manual handoffs.",
+    capabilities: [
+      "Custom business applications",
+      "Customer and partner portals",
+      "Dashboards and admin panels",
+      "APIs and integration",
+    ],
+    solutions: ["product-engineering", "enterprise-technology"],
+  },
 };
 
 /* â”€â”€ The rules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -348,7 +376,7 @@ export const rules: Rule[] = [
   },
   {
     challenge: "product-development",
-    services: ["mobile-app-development", "saas-development", "ios-development"],
+    services: ["mobile-app-development", "website-development", "web-app-development", "saas-development"],
     reason:
       "A new product needs architecture, scope and release discipline from the start â€” that is where most builds succeed or stall.",
   },
@@ -431,13 +459,13 @@ export const phaseSets: PhaseSet[] = [
     ],
   },
   {
-    services: ["mobile-app-development", "ios-development", "saas-development"],
+    services: ["mobile-app-development", "ios-development", "saas-development", "website-development", "web-app-development"],
     phases: [
-      "Product discovery â€” users, journeys and success measures",
-      "Architecture and MVP â€” a thin slice that ships and gets used",
-      "Build and integration â€” APIs, offline behaviour, release pipeline",
-      "Testing and launch â€” device and load testing, store submission",
-      "Iteration and growth â€” analytics, retention, feature depth",
+      "Product discovery - users, journeys and success measures",
+      "Architecture and MVP - a thin slice that ships and gets used",
+      "Build and integration - APIs, offline behaviour, release pipeline",
+      "Testing and launch - device and load testing, store submission",
+      "Iteration and growth - analytics, retention, feature depth",
     ],
   },
   {

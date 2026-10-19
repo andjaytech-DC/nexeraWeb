@@ -29,9 +29,11 @@ const columns: Array<{ title: string; links: Array<{ label: string; href: string
     title: "Services",
     links: [
       { label: "All services", href: "/services" },
+      { label: "Website design & development", href: "/services/website-development" },
+      { label: "Custom web applications", href: "/services/web-app-development" },
+      { label: "Mobile app development", href: "/services/mobile-app-development" },
       { label: "CRM development", href: "/services/crm-development" },
       { label: "ERP development", href: "/services/erp-development" },
-      { label: "SCM development", href: "/services/scm-development" },
       { label: "SaaS development", href: "/services/saas-development" },
       { label: "AI software", href: "/services/ai-software-development" },
     ],
@@ -62,12 +64,20 @@ const columns: Array<{ title: string; links: Array<{ label: string; href: string
 
 export function Footer() {
   return (
-    <footer className="bg-navy">
-      <div className="mx-auto w-full max-w-[1200px] px-5 py-14 sm:px-6 lg:px-8">
+    <footer className="relative overflow-hidden bg-navy">
+      <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.06]" aria-hidden>
+        <defs>
+          <pattern id="footer-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#footer-grid)" />
+      </svg>
+      <div className="relative mx-auto w-full max-w-[1200px] px-5 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_2.6fr]">
           {/* Brand + contact */}
           <div>
-            <Logo onDark />
+            <Logo onDark size="lg" />
             <p className="mt-4 max-w-[340px] text-[15px] leading-7 text-white/70">
               We turn complex business challenges into practical digital solutions — strategy,
               engineering, AI and scalable technology under one accountable partner.

@@ -68,8 +68,10 @@ export const statusColors: Record<InquiryStatus, string> = {
 };
 export const serviceOptions = [
   "Custom Software","CRM","ERP","SCM","SaaS","AI Software","Mobile","iOS","Enterprise Software","Cloud & Integration","BPO","Resource Management","Other",
+  // Must stay in sync with ALLOWED_SERVICES in src/lib/contact-server.ts.
+  "Website Design & Development","Custom Web Application","Android App","Support & Growth",
 ];
-export const projectTypeOptions: string[] = ["New Product","Existing System Modernization","Enterprise Application","AI / Automation","Mobile Application","Integration","Support / Maintenance","Other"];
+export const projectTypeOptions: string[] = ["New Product","Existing System Modernization","Enterprise Application","AI / Automation","Mobile Application","Integration","Support / Maintenance","Other","B2B","B2C"];
 
 // ── Local adapter — demo only ──
 const KEY = "nexara_inquiries_v1";

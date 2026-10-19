@@ -4,9 +4,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Mobile App Development — Services",
-  description: "Android, cross-platform and enterprise mobile applications.",
+  description: "Android, iOS, cross-platform and enterprise mobile app development — B2C shopping, booking and delivery apps, B2B field-service and workforce apps, with backend APIs, push and store release.",
   alternates: { canonical: "/services/mobile-app-development" },
-  openGraph: { title: "Mobile App Development — Services", description: "Android, cross-platform and enterprise mobile applications." },
+  openGraph: { title: "Mobile App Development — Services", description: "Android, iOS, cross-platform and enterprise mobile apps for customers, field teams and operations." },
 };
 export default function Page(){
   return (
@@ -37,7 +37,15 @@ export default function Page(){
             <div className="rounded-2xl border border-line bg-surface p-7">
               <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">CAPABILITIES</h2>
               <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
-                {["Android (Kotlin) and cross-platform (Flutter / React Native)","Offline-first and sync","Push, analytics and engagement","Enterprise MDM and security","API integration and background sync","Store release and ops"].map(t=>(
+                {["Native Android (Kotlin) and native iOS (Swift)","Cross-platform (Flutter / React Native)","Offline-first and background sync","Push, analytics and engagement","Authentication and app security","Enterprise MDM and device management","Backend APIs and integration","App Store / Play Store release and ops"].map(t=>(
+                  <span key={t} className="rounded-xl border border-line bg-surface-alt px-3.5 py-2.5 text-sm text-ink-secondary">{t}</span>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-line bg-surface p-7">
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">APP TYPES WE BUILD — BY BUSINESS MODEL</h2>
+              <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
+                {["B2B — sales, field-service and employee apps","B2B — partner, dealer and distributor apps","B2C — shopping, booking and delivery apps","B2C — subscriptions, loyalty and customer-service apps","Marketplace and on-demand apps","Enterprise workforce and operations apps"].map(t=>(
                   <span key={t} className="rounded-xl border border-line bg-surface-alt px-3.5 py-2.5 text-sm text-ink-secondary">{t}</span>
                 ))}
               </div>
@@ -45,7 +53,7 @@ export default function Page(){
             <div className="rounded-2xl border border-line bg-surface p-7">
               <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">TYPICAL USE CASES</h2>
               <div className="mt-4 flex flex-wrap gap-2">
-                {["Customer-facing apps","Field and operations apps","Logistics and delivery tracking","Enterprise workforce apps"].map(t=>(
+                {["Customer-facing apps","Field and operations apps","Logistics and delivery tracking","Enterprise workforce apps","Mobile commerce","On-demand services"].map(t=>(
                   <span key={t} className="rounded-full border border-line bg-surface-alt px-3.5 py-1.5 text-xs font-[500] text-ink-secondary">{t}</span>
                 ))}
               </div>
@@ -70,24 +78,23 @@ export default function Page(){
               <p className="mt-3 text-xs text-ink-muted">Technology is chosen by requirements, scale and maintainability — only technologies we genuinely support are shown.</p>
             </div>
             <div className="rounded-2xl border border-line bg-surface-alt p-7">
-              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">RELATED SOLUTIONS</h2>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {["Product Engineering","Digital Platforms","Enterprise Technology"].map(t=>(
-                  <span key={t} className="rounded-full border border-line bg-surface-alt px-3.5 py-1.5 text-xs font-[500] text-ink-secondary">{t}</span>
+              <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">RELATED SERVICES</h2>
+              <div className="mt-3 space-y-1.5">
+                {[["Android App Development (native)","/services/android-app-development"],["iOS Development (native)","/services/ios-development"],["Custom Web Applications (backends)","/services/web-app-development"],["AI Software Development (smart features)","/services/ai-software-development"]].map(([label,href])=>(
+                  <Link key={href} href={href} className="block text-sm font-[600] text-ink-secondary hover:text-brand transition">{label} →</Link>
                 ))}
               </div>
-              <Link href="/solutions" className="mt-4 inline-flex text-xs font-[600] text-brand hover:text-brand">View solutions →</Link>
             </div>
             <div className="rounded-2xl border border-line bg-surface p-7">
               <h2 className="text-xs tracking-[0.14em] font-[700] text-ink-secondary">FAQ</h2>
               <div className="mt-4 space-y-4">
-                {[["Native or cross-platform?","We recommend based on performance, offline and device requirements — not by default."]].map(([q,a])=>(
+                {[["Native or cross-platform?","Neither is best for every project. Native suits deep device integration, performance-critical or single-platform-first apps; cross-platform (Flutter / React Native) suits a shared feature set on both stores with one codebase. We recommend per project based on performance, offline and device requirements — not by default."],["Do you support the app after launch?","Yes — store ops, OS-version updates, analytics-driven iteration and ongoing support are part of the service."],["Do you build the backend?","Yes — APIs, authentication, push infrastructure and integration with your existing systems."]].map(([q,a])=>(
                   <div key={q}><div className="text-sm font-[600] text-ink">{q}</div><div className="mt-1 text-sm leading-6 text-ink-secondary">{a}</div></div>
                 ))}
               </div>
             </div>
             <div className="rounded-2xl bg-brand p-7 text-white">
-              <h3 className="text-sm font-[700]">Build mobile app development with Nexara?</h3>
+              <h3 className="text-sm font-[700]">Planning a mobile app?</h3>
               <p className="mt-2 text-sm text-white/80">We start with your business problem — then propose the right technology and delivery model.</p>
               <Link href="/contact?type=new-project" className="mt-4 inline-flex rounded-full bg-white text-brand px-5 py-2.5 text-sm font-[700] hover:bg-brand-soft transition">Start a Project →</Link>
             </div>

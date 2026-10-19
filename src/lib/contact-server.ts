@@ -53,6 +53,10 @@ const ALLOWED_SERVICES = new Set<string>([
   "Custom Software", "CRM", "ERP", "SCM", "SaaS", "AI Software", "Mobile",
   "iOS", "Enterprise Software", "Cloud & Integration", "BPO",
   "Resource Management", "Other",
+  // Service categories added with the services expansion — must stay in sync
+  // with serviceOptions in src/lib/inquiry-store.ts (client dropdown).
+  "Website Design & Development", "Custom Web Application", "Android App",
+  "Support & Growth",
 ]);
 
 const ALLOWED_CONTACT = new Set<string>(["Email", "Phone", "Either"]);
@@ -143,6 +147,81 @@ export function isWebhookConfigured(): boolean {
 }
 
 /**
+ * Read a previously stored inquiry record by id (if any). Used for idempotency.
+ */
+async function readStoredInquiry(id: string): Promise<ContactRecord | null> {
+  if (isBlobStorageConfigured()) {
+    try {
+      const { get } = await import("@vercel/blob");
+      const res = await get(`inquiries/${id}.json`, { access: "private" });
+      if (!res || res.statusCode !== 200 || !res.stream) return null;
+      const text = await new Response(res.stream).text();
+      return JSON.parse(text) as ContactRecord;
+    } catch {
+      return null;
+    }
+  }
+  if (process.env.VERCEL) return null;
+  try {
+    const path = await import("path");
+    const { readFile } = await import("fs/promises");
+    const dir = path.join(process.cwd(), ".data", "inquiries");
+    const raw = await readFile(path.join(dir, `${id}.json`), "utf8");
+    return JSON.parse(raw) as ContactRecord;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Increment and return the per-day enquiry sequence number.
+ */
+async function nextDailyInquirySequence(dateStr: string): Promise<number> {
+  if (isBlobStorageConfigured()) {
+    try {
+      const { get, put } = await import("@vercel/blob");
+      const pathname = `inquiries/_counter_${dateStr}.json`;
+      let count = 0;
+      try {
+        const res = await get(pathname, { access: "private" });
+        if (res && res.statusCode === 200 && res.stream) {
+          const text = await new Response(res.stream).text();
+          count = (JSON.parse(text) as { count?: number }).count ?? 0;
+        }
+      } catch {}
+      count += 1;
+      await put(pathname, JSON.stringify({ count }), {
+        access: "private",
+        contentType: "application/json",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+      });
+      return count;
+    } catch {
+      return 1;
+    }
+  }
+  if (process.env.VERCEL) return 1;
+  try {
+    const path = await import("path");
+    const { mkdir, readFile, writeFile } = await import("fs/promises");
+    const dir = path.join(process.cwd(), ".data", "inquiries");
+    await mkdir(dir, { recursive: true });
+    const file = path.join(dir, `_counter_${dateStr}.json`);
+    let count = 0;
+    try {
+      const raw = await readFile(file, "utf8");
+      count = (JSON.parse(raw) as { count?: number }).count ?? 0;
+    } catch {}
+    count += 1;
+    await writeFile(file, JSON.stringify({ count }), "utf8");
+    return count;
+  } catch {
+    return 1;
+  }
+}
+
+/**
  * Persist an accepted submission. Storage hierarchy mirrors careers-file.ts:
  * private Vercel Blob when configured, JSON file under .data/inquiries (never
  * public/) as a local fallback. Record ids are UUIDs or the validated client
@@ -157,8 +236,17 @@ export async function storeContactSubmission(
     (typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID().replace(/-/g, "")
       : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`);
-  const now = new Date();
-  const reference = `INQ/${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}/${String(now.getMinutes()).padStart(2, "0")}/${String(now.getSeconds()).padStart(2, "0")}/${Math.random().toString(16).slice(2, 10).toUpperCase().padStart(8, "0")}`;
+  const now = opts?.now ? new Date(opts.now) : new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+
+  // Idempotency: if a record already exists for this id, return it unchanged
+  // (no new reference, no counter increment).
+  const existing = await readStoredInquiry(id);
+  if (existing) return existing;
+
+  // Day-by-day enquiry counter: sequential per day, zero-padded to 5 digits.
+  const seq = await nextDailyInquirySequence(dateStr);
+  const reference = `INQ/${dateStr}/${String(now.getMinutes()).padStart(2, "0")}/${String(now.getSeconds()).padStart(2, "0")}/${String(seq).padStart(5, "0")}A01`;
   const createdAt = opts?.now ?? now.toISOString();
   const record: ContactRecord = { ...input, id, reference, createdAt };
   const payload = JSON.stringify(record, null, 2);

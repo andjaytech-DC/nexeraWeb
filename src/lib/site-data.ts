@@ -11,17 +11,21 @@ export const solutions = [
 ] as const;
 
 export const services = [
+  { slug: "website-development", title: "Website Design & Development", short: "Corporate, B2B lead-generation and B2C e-commerce websites, built to convert." },
+  { slug: "web-app-development", title: "Custom Web Applications", short: "Portals, dashboards, booking systems and custom business applications." },
   { slug: "crm-development", title: "CRM Development", short: "Custom CRM platforms for sales, customer management, marketing and service operations." },
   { slug: "erp-development", title: "ERP Development", short: "Integrated systems connecting finance, HR, inventory, procurement and operations." },
   { slug: "scm-development", title: "SCM Development", short: "Technology for inventory, procurement, logistics, warehouse and supply-chain visibility." },
   { slug: "saas-development", title: "SaaS Development", short: "End-to-end SaaS product engineering from architecture to production." },
   { slug: "ai-software-development", title: "AI Software Development", short: "AI-powered applications, assistants, automation and data solutions." },
-  { slug: "mobile-app-development", title: "Mobile App Development", short: "Android, cross-platform and enterprise mobile applications." },
+  { slug: "mobile-app-development", title: "Mobile App Development", short: "Android, iOS, cross-platform and enterprise mobile applications." },
+  { slug: "android-app-development", title: "Android App Development", short: "Native Android applications built with Kotlin, released and supported on Google Play." },
   { slug: "ios-development", title: "iOS Development", short: "Native and cross-platform iPhone / iPad applications." },
   { slug: "enterprise-software", title: "Enterprise Software", short: "Large-scale business applications and operational platforms." },
   { slug: "cloud-integration", title: "Cloud & Integration", short: "Cloud modernization, APIs, integrations and distributed systems." },
   { slug: "bpo", title: "BPO Services", short: "Technology-enabled business process outsourcing for scale and consistency." },
   { slug: "resource-management", title: "Resource Management", short: "Dedicated developers, engineers and technology teams on demand." },
+  { slug: "support-growth", title: "Support & Digital Growth", short: "Maintenance, performance, accessibility, technical SEO and conversion optimization." },
 ] as const;
 
 export const industries = [
@@ -39,11 +43,13 @@ export const industries = [
 ] as const;
 
 // Company contact details — single source so they stay in sync sitewide.
+// The displayed address matches CONTACT_TO_EMAIL (the inbox inquiries are
+// routed to) so a sitewide reply address is one that is actually monitored.
 export const contactInfo = {
   phoneDisplay: "+91 8882033199",
   phoneHref: "tel:+918882033199",
-  email: "archanaffrps08aug@gtmail.com",
-  emailHref: "mailto:archanaffrps08aug@gtmail.com",
+  email: "jay.nexara@gmail.com",
+  emailHref: "mailto:jay.nexara@gmail.com",
 } as const;
 
 // Notification routing — read only by the contact intake route, never

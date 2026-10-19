@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "Nexara Global Solutions",
     title: "Nexara Global Solutions — Technology & Digital Transformation Partner",
     description:
-      "We turn complex business challenges into practical digital solutions. Custom software, CRM, ERP, SCM, SaaS, AI, Mobile & Cloud.",
+      "We turn complex business challenges into practical digital solutions — websites, web applications, mobile apps, CRM, ERP, SCM, SaaS, AI and Cloud.",
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },

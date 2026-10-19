@@ -99,6 +99,7 @@ const VALID = new Set([
   "crm-development", "erp-development", "scm-development", "saas-development",
   "ai-software-development", "mobile-app-development", "ios-development",
   "enterprise-software", "cloud-integration", "bpo", "resource-management",
+  "website-development", "web-app-development",
 ]);
 for (const r of [r1, r2, r3, r4]) {
   check(
@@ -131,7 +132,27 @@ const noContext: FinderAnswers = {
   challenges: ["ai-automation"],
   outcome: "productivity",
 };
-check("results render without optional context", recommend(noContext).recommendations.length > 0);
+const r5 = recommend(noContext);
+check("results render without optional context", r5.recommendations.length > 0);
+
+// 10. Web product development surfaces a web build service
+const webBuild: FinderAnswers = {
+  industry: "professional-services",
+  challenges: ["product-development"],
+  outcome: "productivity",
+};
+const r6 = recommend(webBuild);
+check(
+  "product-development surfaces website / web-app services",
+  r6.recommendations.some((r) => ["website-development", "web-app-development"].includes(r.service.slug)),
+  r6.recommendations.map((r) => r.service.slug).join(", "),
+);
+for (const r of [r6]) {
+  check(
+    "web-build slugs map to real /services routes",
+    r.recommendations.every((x) => VALID.has(x.service.slug)),
+  );
+}
 
 console.log(failures === 0 ? "\nAll recommendation engine checks passed." : `\n${failures} check(s) failed.`);
 process.exit(failures === 0 ? 0 : 1);
