@@ -4,10 +4,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Students & Entry Level — Careers",
+  title: "Students & Entry Level",
   description: "For students, recent graduates and early-career professionals — software development, AI & data, QA, UI/UX, mobile, cloud and business operations.",
   alternates: { canonical: "/careers/students" },
-  openGraph: { title: "Students & Entry Level — Careers", description: "For students, recent graduates and early-career professionals — software development, AI & data, QA, UI/UX, mobile, cloud and business operations." },
+  openGraph: { title: "Students & Entry Level", description: "For students, recent graduates and early-career professionals — software development, AI & data, QA, UI/UX, mobile, cloud and business operations." },
 };
 
 export default function StudentsPage() {

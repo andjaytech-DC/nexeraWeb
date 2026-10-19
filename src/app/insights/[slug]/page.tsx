@@ -24,10 +24,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const a = articles[slug];
   if (!a) return { title: "Article — Nexara", robots: { index: false } };
   return {
-    title: `${a.title} — Insights`,
+    title: { absolute: a.title },
     description: a.desc,
     alternates: { canonical: `/insights/${slug}` },
-    openGraph: { title: `${a.title} — Insights`, description: a.desc },
+    openGraph: { title: { absolute: a.title }, description: a.desc },
   };
 }
 

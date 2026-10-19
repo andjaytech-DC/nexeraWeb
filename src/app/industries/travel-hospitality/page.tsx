@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
-  title: "Travel & Hospitality — Industries",
+  title: "Travel & Hospitality",
   description: "Travel and hospitality coordinate bookings, operations and guest experience — with seasonality and high volume.",
   alternates: { canonical: "/industries/travel-hospitality" },
-  openGraph: { title: "Travel & Hospitality — Industries", description: "Travel and hospitality coordinate bookings, operations and guest experience — with seasonality and high volume." },
+  openGraph: { title: "Travel & Hospitality", description: "Travel and hospitality coordinate bookings, operations and guest experience — with seasonality and high volume." },
 };
 export default function Page(){
   return (

@@ -6,9 +6,9 @@ import { services } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Services",
-  description: "Website design and development for B2B and B2C, custom web applications, Android and iOS mobile apps, CRM, ERP, SCM, SaaS, AI software, cloud, BPO, resource management and ongoing support.",
+  description: "Websites for B2B and B2C, custom web applications, Android and iOS mobile apps, CRM, ERP, SCM, SaaS, AI software, cloud, BPO, resource management and support.",
   alternates: { canonical: "/services" },
-  openGraph: { title: "Services", description: "Website design and development for B2B and B2C, custom web applications, Android and iOS mobile apps, CRM, ERP, SCM, SaaS, AI software, cloud, BPO, resource management and ongoing support." },
+  openGraph: { title: "Services", description: "Websites for B2B and B2C, custom web applications, Android and iOS mobile apps, CRM, ERP, SCM, SaaS, AI software, cloud, BPO, resource management and support." },
 };
 
 export default function ServicesPage() {

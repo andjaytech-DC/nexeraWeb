@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
-  title: "Business Process Transformation — Solutions",
+  title: "Business Process Transformation",
   description: "Re-engineer how work gets done — from manual handoffs to governed digital workflows.",
   alternates: { canonical: "/solutions/business-process-transformation" },
-  openGraph: { title: "Business Process Transformation — Solutions", description: "Re-engineer how work gets done — from manual handoffs to governed digital workflows." },
+  openGraph: { title: "Business Process Transformation", description: "Re-engineer how work gets done — from manual handoffs to governed digital workflows." },
 };
 export default function Page(){
   return (

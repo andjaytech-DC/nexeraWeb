@@ -5,9 +5,9 @@ import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Technology",
-  description: "Built with the right technology: Application Engineering, Frontend, Backend, Mobile, AI & Data, Databases, Cloud, DevOps and Integration — only technologies we genuinely support.",
+  description: "The technologies we genuinely support — application engineering, frontend, backend, mobile, AI and data, databases, cloud, DevOps and integration.",
   alternates: { canonical: "/technologies" },
-  openGraph: { title: "Technology", description: "Built with the right technology: Application Engineering, Frontend, Backend, Mobile, AI & Data, Databases, Cloud, DevOps and Integration — only technologies we genuinely support." },
+  openGraph: { title: "Technology", description: "The technologies we genuinely support — application engineering, frontend, backend, mobile, AI and data, databases, cloud, DevOps and integration." },
 };
 
 const groups = [

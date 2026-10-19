@@ -13,15 +13,7 @@ import { EngagementPaths } from "./sections/EngagementPaths";
 import { FinalCta } from "./sections/FinalCta";
 
 export const metadata: Metadata = {
-  title: "Nexara Global Solutions — Build Better. Operate Smarter. Grow Faster.",
-  description:
-    "Nexara Global Solutions helps businesses turn complex challenges into intelligent digital products, enterprise platforms, AI-powered software and scalable technology solutions.",
   alternates: { canonical: "/" },
-  openGraph: {
-    title: "Nexara Global Solutions — Build Better. Operate Smarter. Grow Faster.",
-    description:
-      "Nexara Global Solutions helps businesses turn complex challenges into intelligent digital products, enterprise platforms, AI-powered software and scalable technology solutions.",
-  },
 };
 
 /* ───────────────────────────────────────────────────────────────────────────

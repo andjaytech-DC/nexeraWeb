@@ -1,19 +1,62 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { siteUrl } from "@/lib/site-url";
+import { contactInfo } from "@/lib/site-data";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
+/* Organization + WebSite structured data. Emitted once from the root layout so
+   every page carries org-level schema (ContactPoint carries the monitored
+   inbox and the published address — same values the site displays). */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl()}/#organization`,
+      name: "Nexara Global Solutions",
+      url: siteUrl(),
+      logo: { "@type": "ImageObject", url: `${siteUrl()}/images/logo.png` },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "3rd Floor, D23 Building, S3V Business Park, Sector-59",
+        addressLocality: "Noida",
+        addressRegion: "Uttar Pradesh",
+        postalCode: "201301",
+        addressCountry: "IN",
+      },
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          telephone: "+91-8882033199",
+          email: contactInfo.email,
+          contactType: "customer support",
+          areaServed: "IN",
+          availableLanguage: "en",
+        },
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl()}/#website`,
+      url: siteUrl(),
+      name: "Nexara Global Solutions",
+      inLanguage: "en-IN",
+      publisher: { "@id": `${siteUrl()}/#organization` },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: {
-    default: "Nexara Global Solutions — Build Better. Operate Smarter. Grow Faster.",
+    default: "Nexara Global Solutions — Software, AI & Digital Systems",
     template: "%s | Nexara Global Solutions",
   },
   description:
-    "Nexara Global Solutions helps businesses turn complex challenges into intelligent digital products, enterprise platforms, AI-powered software and scalable technology solutions. Noida, India.",
+    "Nexara Global Solutions turns complex challenges into intelligent digital products, enterprise platforms and AI-powered software — from Noida, India.",
   metadataBase: new URL(siteUrl()),
   openGraph: {
     type: "website",
@@ -41,6 +84,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to main content
         </a>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {children}
       </body>
     </html>

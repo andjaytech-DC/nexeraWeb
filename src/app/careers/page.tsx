@@ -4,10 +4,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Careers — Build What's Next With Nexara",
-  description: "Join Nexara Global Solutions — software, AI-powered solutions and digital systems that help businesses operate and grow. Explore job search, students, contract and talent community.",
+  title: "Careers — Build What's Next",
+  description: "Join Nexara Global Solutions — explore job search, campus and entry-level roles, contract opportunities and the talent community.",
   alternates: { canonical: "/careers" },
-  openGraph: { title: "Careers — Build What's Next With Nexara", description: "Join Nexara Global Solutions — software, AI-powered solutions and digital systems that help businesses operate and grow. Explore job search, students, contract and talent community." },
+  openGraph: { title: "Careers — Build What's Next", description: "Join Nexara Global Solutions — explore job search, campus and entry-level roles, contract opportunities and the talent community." },
 };
 
 export default function CareersPage() {

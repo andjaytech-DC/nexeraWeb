@@ -4,10 +4,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Website Design & Development — Services",
-  description: "Corporate, B2B lead-generation and B2C e-commerce website development — booking, directory, marketplace and CMS-driven websites, landing pages and modernization.",
+  title: "Website Design & Development",
+  description: "Corporate, B2B lead-generation and B2C e-commerce websites — booking, directory, marketplace and CMS-driven builds, landing pages and modernization.",
   alternates: { canonical: "/services/website-development" },
-  openGraph: { title: "Website Design & Development — Services", description: "Corporate, B2B lead-generation and B2C e-commerce website development — booking, directory, marketplace and CMS-driven websites, landing pages and modernization." },
+  openGraph: { title: "Website Design & Development", description: "Corporate, B2B lead-generation and B2C e-commerce websites — booking, directory, marketplace and CMS-driven builds, landing pages and modernization." },
 };
 
 export default function Page() {

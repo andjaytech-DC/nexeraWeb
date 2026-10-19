@@ -6,7 +6,7 @@ import SolutionFinderClient from "./SolutionFinderClient";
 export const metadata: Metadata = {
   title: "Business Solution Finder",
   description:
-    "Answer a few questions about your industry, business challenges and goals. We map them to the Nexara services and delivery approach that fit — preliminary guidance, no registration required.",
+    "Answer a few questions about your industry, challenges and goals — we map them to the Nexara services and delivery approach that fit.",
   alternates: { canonical: "/solution-finder" },
 };
 

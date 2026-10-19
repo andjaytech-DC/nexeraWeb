@@ -4,10 +4,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Custom Web Applications — Services",
-  description: "Custom web application development — customer, vendor and employee portals, dashboards, admin panels, booking and workflow systems, APIs and third-party integrations.",
+  title: "Custom Web Applications",
+  description: "Custom web application development — customer and vendor portals, dashboards, admin panels, booking and workflow systems, APIs and third-party integrations.",
   alternates: { canonical: "/services/web-app-development" },
-  openGraph: { title: "Custom Web Applications — Services", description: "Customer, vendor and employee portals, dashboards, admin panels, booking and workflow systems, APIs and integrations." },
+  openGraph: { title: "Custom Web Applications", description: "Customer, vendor and employee portals, dashboards, admin panels, booking and workflow systems, APIs and integrations." },
 };
 
 export default function Page() {

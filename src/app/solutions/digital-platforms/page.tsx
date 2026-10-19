@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
-  title: "Digital Platforms & SaaS — Solutions",
+  title: "Digital Platforms & SaaS",
   description: "Build scalable cloud-based products engineered for multi-tenancy, billing and growth.",
   alternates: { canonical: "/solutions/digital-platforms" },
-  openGraph: { title: "Digital Platforms & SaaS — Solutions", description: "Build scalable cloud-based products engineered for multi-tenancy, billing and growth." },
+  openGraph: { title: "Digital Platforms & SaaS", description: "Build scalable cloud-based products engineered for multi-tenancy, billing and growth." },
 };
 export default function Page(){
   return (

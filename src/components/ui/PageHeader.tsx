@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Container, cx } from "./primitives";
+import { siteUrl } from "@/lib/site-url";
 
 /* ───────────────────────────────────────────────────────────────────────────
    Standard interior page header: breadcrumb, H1, optional tagline and
@@ -31,7 +32,29 @@ export function PageHeader({
       />
       <Container className="relative py-12 sm:py-16">
         {breadcrumb ? (
-          <nav
+          <>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BreadcrumbList",
+                  // Google's BreadcrumbList example allows omitting the URL of
+                  // the final (current-page) element — the parent href is all
+                  // PageHeader knows without touching every call site.
+                  itemListElement: [
+                    {
+                      "@type": "ListItem",
+                      position: 1,
+                      name: breadcrumb.label,
+                      ...(breadcrumb.href ? { item: `${siteUrl()}${breadcrumb.href}` } : {}),
+                    },
+                    { "@type": "ListItem", position: 2, name: title },
+                  ],
+                }),
+              }}
+            />
+            <nav
             aria-label="Breadcrumb"
             className="mb-4 flex flex-wrap items-center gap-2 text-xs font-[700] uppercase tracking-[0.14em]"
           >
@@ -47,6 +70,7 @@ export function PageHeader({
             </span>
             <span className="text-ink-secondary">{title}</span>
           </nav>
+          </>
         ) : null}
         <h1 className="max-w-[840px] font-[var(--font-display)] text-[32px] font-[800] leading-[1.1] tracking-[-0.03em] text-ink sm:text-[42px] lg:text-[50px]">
           {title}

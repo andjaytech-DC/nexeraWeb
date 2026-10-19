@@ -5,10 +5,10 @@ import { Footer } from "@/components/Footer";
 import TalentCommunityForm from "./TalentCommunityForm";
 
 export const metadata: Metadata = {
-  title: "Talent Community — Stay Connected With Nexara",
+  title: "Talent Community",
   description: "Join Nexara's talent community — share your skills and interests for future opportunities.",
   alternates: { canonical: "/careers/talent-community" },
-  openGraph: { title: "Talent Community — Stay Connected With Nexara", description: "Join Nexara's talent community — share your skills and interests for future opportunities." },
+  openGraph: { title: "Talent Community", description: "Join Nexara's talent community — share your skills and interests for future opportunities." },
 };
 
 export default function TalentCommunityPage() {

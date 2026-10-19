@@ -6,9 +6,9 @@ import { solutions } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Solutions",
-  description: "Outcome-based solutions: Digital Transformation, Intelligent Automation, Product Engineering, Enterprise Technology, AI-Powered Software, Digital Platforms, Business Process Transformation and System Integration.",
+  description: "Outcome-based solutions: digital transformation, intelligent automation, product engineering, enterprise technology and AI-powered software.",
   alternates: { canonical: "/solutions" },
-  openGraph: { title: "Solutions", description: "Outcome-based solutions: Digital Transformation, Intelligent Automation, Product Engineering, Enterprise Technology, AI-Powered Software, Digital Platforms, Business Process Transformation and System Integration." },
+  openGraph: { title: "Solutions", description: "Outcome-based solutions: digital transformation, intelligent automation, product engineering, enterprise technology and AI-powered software." },
 };
 
 export default function SolutionsPage() {

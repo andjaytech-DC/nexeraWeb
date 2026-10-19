@@ -4,10 +4,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Support & Digital Growth — Services",
-  description: "Website and application maintenance, performance and accessibility improvements, technical SEO, analytics, conversion optimization and continuous product support.",
+  title: "Support & Digital Growth",
+  description: "Website and application maintenance, performance and accessibility improvements, technical SEO, analytics and conversion optimization.",
   alternates: { canonical: "/services/support-growth" },
-  openGraph: { title: "Support & Digital Growth — Services", description: "Maintenance, performance, accessibility, technical SEO, analytics and conversion optimization for websites and applications." },
+  openGraph: { title: "Support & Digital Growth", description: "Maintenance, performance, accessibility, technical SEO, analytics and conversion optimization for websites and applications." },
 };
 
 export default function Page() {

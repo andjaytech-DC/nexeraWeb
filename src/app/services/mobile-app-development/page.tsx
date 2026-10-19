@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
-  title: "Mobile App Development — Services",
-  description: "Android, iOS, cross-platform and enterprise mobile app development — B2C shopping, booking and delivery apps, B2B field-service and workforce apps, with backend APIs, push and store release.",
+  title: "Mobile App Development",
+  description: "Android, iOS and cross-platform mobile apps for B2C shopping and booking, plus B2B field-service and workforce apps — with backend APIs and store release.",
   alternates: { canonical: "/services/mobile-app-development" },
-  openGraph: { title: "Mobile App Development — Services", description: "Android, iOS, cross-platform and enterprise mobile apps for customers, field teams and operations." },
+  openGraph: { title: "Mobile App Development", description: "Android, iOS, cross-platform and enterprise mobile apps for customers, field teams and operations." },
 };
 export default function Page(){
   return (

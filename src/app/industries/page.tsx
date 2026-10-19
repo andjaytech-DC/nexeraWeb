@@ -6,9 +6,9 @@ import { industries } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Industries",
-  description: "Industry-focused technology for Automotive, Healthcare, Financial Services, Retail, Manufacturing, Logistics, Education, Real Estate, E-commerce, Travel & Hospitality and Professional Services.",
+  description: "Industry-focused technology for automotive, healthcare, financial services, retail, manufacturing, logistics, education, real estate and professional services.",
   alternates: { canonical: "/industries" },
-  openGraph: { title: "Industries", description: "Industry-focused technology for Automotive, Healthcare, Financial Services, Retail, Manufacturing, Logistics, Education, Real Estate, E-commerce, Travel & Hospitality and Professional Services." },
+  openGraph: { title: "Industries", description: "Industry-focused technology for automotive, healthcare, financial services, retail, manufacturing, logistics, education, real estate and professional services." },
 };
 
 export default function IndustriesPage() {
