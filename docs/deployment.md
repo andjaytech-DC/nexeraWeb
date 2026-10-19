@@ -47,12 +47,34 @@ reports "unavailable", that is the state until the backend is actually reachable
 
 ## 3. Deploying to Vercel
 
-1. Import the repository into Vercel (framework: Next.js; `postinstall` runs
-   `prisma generate`; zero-config build otherwise).
-2. Set the **required** variables from §2 (or connect a Blob store + Postgres
-   from the Vercel marketplace — connecting sets the Blob variables via OIDC
-   automatically).
-3. Deploy, then point the production domain at the deployment.
+### 3a. Dashboard-first path (no CLI)
+
+1. In vercel.com/new, import the GitHub repo (`andjaytech-DC/nexeraWeb`).
+   Framework detection is automatic; every route is prerendered or a route
+   handler, so no build overrides are needed.
+2. **Before the first deploy**, open the project's *Settings → Environment
+   Variables* and add the §2 items. The truth audit of what's outstanding is
+   `npm run check:config` (it never prints values). `ADMIN_PASSWORD` and
+   `ADMIN_SESSION_SECRET` are your local secrets — copy them from the local
+   `.env` file.
+3. In the project's *Storage* tab, connect one Postgres store and one Blob
+   store. Connecting them injects their environment variables automatically —
+   do not hand-edit those.
+4. Deploy, then point the production domain at the deployment.
+5. Email notifications: create an API key at resend.com/api-keys and set
+   `RESEND_API_KEY` plus `EMAIL_FROM`. A verified sending domain is not needed
+   for launch *if* notifications go to your own inbox — the unverified test
+   sender (`onboarding@resend.dev`) delivers only to the Resend account
+   owner's mailbox, which is exactly the owner-notification case. Verify the
+   domain before relying on delivery to anyone else.
+
+### 3b. CLI path
+
+1. `npx vercel login`, then `npx vercel link`.
+2. `npx vercel env pull .env.vercel` to inspect, `npx vercel env add` to set
+   variables (or connect stores in the dashboard as above — CLI cannot create
+   marketplace stores).
+3. `npx vercel --prod` to release.
 
 ## 4. Database provisioning (careers only)
 
