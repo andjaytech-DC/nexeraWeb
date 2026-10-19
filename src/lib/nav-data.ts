@@ -27,6 +27,6 @@ export const careersItems: Array<NavItem & { desc: string }> = [
 ];
 
 /** Shared nav-link styling — used by desktop and mobile menus alike. */
-export const NAV_LINK = "text-[14px] font-[600] transition";
+export const NAV_LINK = "text-[14px] font-[500] transition";
 export const NAV_IDLE = "text-ink-secondary hover:text-brand";
 export const NAV_ACTIVE = "text-brand";

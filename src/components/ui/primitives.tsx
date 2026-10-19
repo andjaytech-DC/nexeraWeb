@@ -55,10 +55,10 @@ export function Section({
 } & Omit<ComponentPropsWithoutRef<"section">, "children" | "className" | "as">) {
   const pad =
     size === "lg"
-      ? "py-16 sm:py-20 lg:py-24"
+      ? "py-20 sm:py-24 lg:py-32"
       : size === "sm"
         ? "py-10 sm:py-12"
-        : "py-12 sm:py-16 lg:py-20";
+        : "py-14 sm:py-20 lg:py-24";
   return (
     <Tag id={id} className={cx(SECTION_TONES[tone], pad, className)} {...rest}>
       {children}

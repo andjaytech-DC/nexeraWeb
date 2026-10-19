@@ -7,7 +7,7 @@
    ──────────────────────────────────────────────────────────────────────────── */
 @theme inline {
   /* Surfaces */
-  --color-canvas: #F8FAFC;      /* page background */
+  --color-canvas: #F3F6FC;      /* page background */
   --color-surface: #FFFFFF;     /* primary cards / sections */
   --color-surface-alt: #F1F5F9; /* alternating sections, subtle fills */
   --color-line: #E2E8F0;        /* borders */
@@ -16,10 +16,10 @@
   /* Text */
   --color-ink: #111827;         /* main text (17.4:1 on white) */
   --color-ink-secondary: #475569; /* secondary text (11.96:1 on white) */
-  --color-ink-muted: #64748B;   /* de-emphasised meta (4.76:1 on white; do NOT use on surface-alt — use ink-secondary instead)
+  --color-ink-muted: #64748B;   /* de-emphasised meta (4.76:1 on white; do NOT use on surface-alt — use ink-secondary instead) */
 
   /* Brand */
-  --color-brand: #315EFB;       /* primary blue */
+  --color-brand: #3267F5;       /* primary blue */
   --color-brand-hover: #2349D4; /* hover state (AA against white text) */
   --color-brand-soft: #EEF3FF;  /* tinted panels */
   --color-brand-line: #C3D2FE;  /* tinted panel borders */
@@ -40,7 +40,7 @@
   --color-accent-soft: #ECFEFF;
 
   /* Selective dark — used sparingly for CTAs and diagrams only */
-  --color-navy: #0F172A;
+  --color-navy: #0B1224;
   --color-navy-soft: #1E293B;
 
   /* Status */

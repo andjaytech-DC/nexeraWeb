@@ -1,47 +1,35 @@
 import Link from "next/link";
+import Image from "next/image";
 
-/* ───────────────────────────────────────────────────────────────────────────
-   Nexara logo — light theme.
+type LogoProps = {
+  onDark?: boolean;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+};
 
-   Wordmark in main text colour with the brand blue mark; `onDark` is available
-   for the selective navy panels.
-   ─────────────────────────────────────────────────────────────────────────── */
+const SIZES = {
+  sm: { h: 28, w: 44 },
+  md: { h: 36, w: 56 },
+  lg: { h: 48, w: 75 },
+} as const;
 
-export function Logo({ onDark = false }: { onDark?: boolean }) {
+export function Logo({ onDark = false, size = "md", className }: LogoProps) {
+  const { h, w } = SIZES[size];
   return (
-    <Link href="/" className="flex items-center gap-3" aria-label="Nexara Global Solutions home">
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-brand">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden>
-          <path
-            d="M7 7L14 12L21 7V21L14 16L7 21V7Z"
-            stroke="white"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-          />
-          <circle cx="7" cy="7" r="1.6" fill="white" />
-          <circle cx="14" cy="12" r="1.6" fill="white" />
-          <circle cx="21" cy="7" r="1.6" fill="white" />
-          <circle cx="21" cy="21" r="1.6" fill="white" />
-          <circle cx="7" cy="21" r="1.6" fill="white" />
-          <circle cx="14" cy="16" r="1.6" fill="white" />
-        </svg>
-      </span>
-      <span className="flex flex-col leading-none">
-        <span
-          className={`font-[var(--font-display)] text-[17px] font-[800] tracking-[-0.02em] ${
-            onDark ? "text-white" : "text-ink"
-          }`}
-        >
-          NEXARA
-        </span>
-        <span
-          className={`text-[10px] font-[600] uppercase tracking-[0.18em] ${
-            onDark ? "text-white/70" : "text-ink-muted"
-          }`}
-        >
-          Global Solutions
-        </span>
-      </span>
+    <Link
+      href="/"
+      aria-label="Nexara Global Solutions home"
+      className={`group inline-flex items-center transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500 ${className ?? ""}`}
+    >
+      <Image
+        src="/images/logo.png"
+        alt="Nexara Global Solutions"
+        width={w}
+        height={h}
+        priority
+        className="h-auto w-auto"
+        style={{ height: h, width: "auto" }}
+      />
     </Link>
   );
 }
