@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "npx tsx scripts/test-recommend.ts",
     "test:intake": "npx tsx scripts/test-intake.ts",
+    "test:contact": "npx tsx scripts/test-contact.ts",
+    "check:config": "npx tsx scripts/check-deployment-config.ts",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy"

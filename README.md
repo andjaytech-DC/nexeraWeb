@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexara Global Solutions — nexeraWeb
 
-## Getting Started
+Marketing and intake site for Nexara Global Solutions: services, industries,
+solutions, a Solution Finder, careers, and an admin panel.
 
-First, run the development server:
+## Stack
+
+Next.js (App Router) · React 19 · Tailwind CSS 4 · Prisma/PostgreSQL · Vercel Blob
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env      # fill in values; see docs/deployment.md §2
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` / `build` / `start` | Development, production build, production server |
+| `npm run typecheck` / `lint` | TypeScript and ESLint (lint currently reports pre-existing warnings, no errors) |
+| `npm run test` | Recommendation-engine checks |
+| `npm run test:intake` | HTTP tests against the intake endpoints (spins its own server) |
+| `npm run test:contact` | Validation/webhook/email module tests (no server needed) |
+| `npm run check:config` | Truthful audit of deployment configuration; `-- --enforce` fails on missing REQUIRED items |
+| `npm run db:push` / `db:migrate` | Apply the Prisma schema / deploy migrations once a baseline exists |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture notes
 
-## Learn More
+- **Inquiries** (`/contact` → `POST /api/inquiries`) persist to Vercel Blob when
+  configured, else to `.data/` files in local dev; on Vercel without Blob they
+  are rejected with 503 rather than lost.
+- **Careers** use PostgreSQL via Prisma. The repo ships **without a migrations
+  folder** — provision with `prisma db push` or create a baseline first
+  (docs/deployment.md §4).
+- **Admin** (`/admin`) is secured by `ADMIN_PASSWORD` + `ADMIN_SESSION_SECRET`
+  via a signed cookie.
+- **Email** to the owner after an inquiry is accepted is optional and
+  truthfully reported: see `src/lib/email.ts` and docs/deployment.md §6.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`docs/deployment.md`](docs/deployment.md) for the full runbook: required
+environment variables and what breaks without them, Vercel + PostgreSQL
+provisioning, post-deploy smoke tests (`/api/health`, test inquiry via
+`/contact`, admin login), rollback, and known limitations.
