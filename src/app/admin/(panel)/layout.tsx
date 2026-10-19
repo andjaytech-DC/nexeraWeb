@@ -9,7 +9,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
       <div className="border-b border-white/10 bg-[#0F141E] sticky top-0 z-40">
         <div className="mx-auto max-w-[1280px] px-5 sm:px-6 lg:px-8 h-[56px] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Logo size="sm" />
+            <Logo compact />
             <span className="font-[700] tracking-[-0.02em] text-white/80">ADMIN</span>
           </div>
           <div className="flex items-center gap-5">

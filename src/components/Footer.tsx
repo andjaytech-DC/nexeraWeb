@@ -77,7 +77,7 @@ export function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_2.6fr]">
           {/* Brand + contact */}
           <div>
-            <Logo onDark size="lg" />
+            <Logo onDark />
             <p className="mt-4 max-w-[340px] text-[15px] leading-7 text-white/70">
               We turn complex business challenges into practical digital solutions — strategy,
               engineering, AI and scalable technology under one accountable partner.
