@@ -15,9 +15,11 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: Job[] })
 
   const jobs = initialJobs;
 
-  const depts = ["All", "Software Engineering","AI & Data","Mobile Development","UI/UX","QA & Testing","DevOps & Cloud","Business Development","Sales","Operations","BPO","Other"];
+  const depts = ["All","IT","BPO","HR","Software Engineering","AI & Data","Mobile Development","UI/UX","QA & Testing","DevOps & Cloud","Business Development","Sales","Operations","Other"];
   const types = ["All","Full-time","Part-time","Contract","Internship"];
-  const levels = ["All","Entry","Mid","Senior","Lead"];
+  // Experience options come from the live listings (same pattern as locations)
+  // so the exact-match filter always matches whatever the admin published.
+  const levels = ["All", ...Array.from(new Set(jobs.map(j=>j.experienceLevel).filter((x): x is string => Boolean(x))))];
   const locs = ["All", ...Array.from(new Set(jobs.map(j=>j.location)))];
 
   const filtered = useMemo(() => {

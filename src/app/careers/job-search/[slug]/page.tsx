@@ -4,18 +4,19 @@ import type { Job } from "@prisma/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { siteUrl } from "@/lib/site-url";
+import { contactInfo } from "@/lib/site-data";
 import { safeDb } from "@/lib/prisma";
 import JobApplyForm from "./JobApplyForm";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const job = await safeDb(async (db) => db.job.findUnique({ where: { slug } }), null as Job | null);
-  if (!job || !job.isPublished) return { title: "Job", robots: { index: false } };
+  if (!job || !job.isPublished || job.status !== "Published") return { title: "Job", robots: { index: false } };
   return {
-    title: `${job.title} — ${job.department}`,
-    description: job.description.slice(0, 160),
+    title: job.title,
+    description: job.description.slice(0, 155),
     alternates: { canonical: `/careers/job-search/${slug}` },
-    openGraph: { title: `${job.title} — ${job.department}`, description: job.description.slice(0, 160) },
+    openGraph: { title: job.title, description: job.description.slice(0, 155) },
   };
 }
 
@@ -31,7 +32,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           <h1 className="text-[28px] font-[800] tracking-[-0.03em] text-ink">Position not available</h1>
           <p className="mt-3 text-sm leading-6 text-ink-secondary">This opening is not currently published. Explore other opportunities or share your resume for future roles.</p>
           <div className="mt-6 flex justify-center gap-3">
-            <Link href="/careers/job-search" className="rounded-full border border-line bg-white/[0.05] px-5 py-2.5 text-sm font-[600] text-ink">Back to Job Search</Link>
+            <Link href="/careers/job-search" className="rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-[600] text-ink">Back to Job Search</Link>
             <Link href="/careers/send-resume" className="rounded-full bg-brand px-5 py-2.5 text-sm font-[700] text-white">Send Your Resume →</Link>
           </div>
         </div>
@@ -40,7 +41,25 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
     );
   }
 
-  const jsonLd = {
+  const applyEmail = job.applyEmail || contactInfo.email;
+  const applySubject = `Application: ${job.title}`;
+  const applyBody = [
+    `Hello Nexara Team,`,
+    ``,
+    `I am applying for the ${job.title} position listed on your careers page.`,
+    ``,
+    `My resume is attached. Contact details:`,
+    `Name: `,
+    `Email: `,
+    `Phone: `,
+    `Location: `,
+    ``,
+    `Looking forward to hearing from you.`,
+    ``,
+    `Best regards,`,
+  ].join("\n");
+
+  const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: job.title,
@@ -57,13 +76,19 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="border-b border-line bg-surface">
         <div className="mx-auto max-w-[960px] px-5 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center gap-2 text-[11px] tracking-[0.12em] font-[700] text-ink-muted"><Link href="/careers" className="hover:text-brand">CAREERS</Link><span>/</span><Link href="/careers/job-search" className="hover:text-brand">JOB SEARCH</Link><span>/</span><span className="text-ink-secondary">{job.title.toUpperCase()}</span></div>
+          <div className="flex items-center gap-2 text-[11px] tracking-[0.12em] font-[700] text-ink-muted">
+            <Link href="/careers" className="hover:text-brand">CAREERS</Link><span>/</span>
+            <Link href="/careers/job-search" className="hover:text-brand">JOB SEARCH</Link><span>/</span>
+            <span className="text-ink-secondary">{job.title.toUpperCase()}</span>
+          </div>
           <h1 className="mt-3 font-[var(--font-jakarta)] text-[32px] sm:text-[40px] font-[800] tracking-[-0.03em] leading-[1.05] text-ink">{job.title}</h1>
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.department}</span>
             <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.location}</span>
             <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.employmentType}</span>
-            {job.experienceLevel && <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.experienceLevel}</span>}
+            <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.experienceLevel || "Experience: as per role"}</span>
+            {job.workMode && <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.workMode}</span>}
+            {job.shiftInfo && <span className="rounded-full border border-line bg-surface-alt px-3 py-1.5 text-ink-secondary">{job.shiftInfo}</span>}
           </div>
         </div>
       </section>
@@ -75,31 +100,55 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           </div>
           <div className="rounded-2xl border border-line bg-surface p-7">
             <h2 className="text-sm font-[700] text-ink">Responsibilities</h2>
-            <p className="mt-3 text-sm leading-7 text-ink-secondary whitespace-pre-wrap">{job.responsibilities}</p>
+            <MultiLineList text={job.responsibilities} />
           </div>
           <div className="rounded-2xl border border-line bg-surface p-7">
             <h2 className="text-sm font-[700] text-ink">Required skills</h2>
-            <p className="mt-3 text-sm leading-7 text-ink-secondary whitespace-pre-wrap">{job.requirements}</p>
+            <MultiLineList text={job.requirements} />
           </div>
           {job.preferredSkills && (
             <div className="rounded-2xl border border-line bg-surface p-7">
               <h2 className="text-sm font-[700] text-ink">Preferred skills</h2>
-              <p className="mt-3 text-sm leading-7 text-ink-secondary whitespace-pre-wrap">{job.preferredSkills}</p>
+              <MultiLineList text={job.preferredSkills} />
             </div>
           )}
           <div className="rounded-2xl border border-line bg-surface-alt p-7">
-            <h2 className="text-xs tracking-[0.12em] font-[700] text-ink-muted">WHAT YOU&apos;LL WORK ON</h2>
-            <p className="mt-2 text-sm leading-6 text-ink-secondary">Projects across software engineering, AI, cloud and digital transformation for real business impact — not generic ticket work.</p>
+            <h2 className="text-xs tracking-[0.12em] font-[700] text-ink-muted">ELIGIBILITY & WORK SETUP</h2>
+            <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-[700] text-ink-muted">Experience</dt>
+                <dd className="mt-1 text-sm text-ink-secondary">{job.experienceLevel || "As per requirements"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-[700] text-ink-muted">Location</dt>
+                <dd className="mt-1 text-sm text-ink-secondary">{job.location}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-[700] text-ink-muted">Work mode</dt>
+                <dd className="mt-1 text-sm text-ink-secondary">{job.workMode || "As per role requirements"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-[700] text-ink-muted">Shift</dt>
+                <dd className="mt-1 text-sm text-ink-secondary">{job.shiftInfo || "As per role requirements"}</dd>
+              </div>
+            </dl>
           </div>
         </div>
         <div className="space-y-6 lg:sticky lg:top-[84px] self-start">
           <div className="rounded-2xl border border-line bg-surface p-7">
-            <h3 className="text-xs tracking-[0.12em] font-[700] text-ink-muted">EXPERIENCE</h3>
-            <p className="mt-2 text-sm text-white/80">{job.experienceLevel || "As per requirements"}</p>
-            <h3 className="mt-4 text-xs tracking-[0.12em] font-[700] text-ink-muted">EMPLOYMENT TYPE</h3>
-            <p className="mt-2 text-sm text-white/80">{job.employmentType}</p>
+            <h3 className="text-xs tracking-[0.12em] font-[700] text-ink-muted">HOW TO APPLY</h3>
+            <p className="mt-2 text-sm leading-6 text-ink-secondary">
+              Apply with the form below, or email us your CV/resume directly — applications from either route reach the same inbox.
+            </p>
           </div>
           <JobApplyForm jobId={job.id} jobTitle={job.title} />
+          <a
+            href={`mailto:${applyEmail}?subject=${encodeURIComponent(applySubject)}&body=${encodeURIComponent(applyBody)}`}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface-alt px-6 py-3 text-sm font-[700] text-ink transition hover:border-brand hover:text-brand"
+          >
+            Apply by Email <span aria-hidden>→</span>
+            <span className="sr-only"> for {job.title}</span>
+          </a>
           <div className="rounded-xl border border-line bg-surface-alt p-4 text-xs leading-5 text-ink-muted">
             By applying you consent to Nexara using your information to consider you for this and related opportunities. Resumes are stored securely — not at public URLs.
           </div>
@@ -107,5 +156,26 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
       </div>
       <Footer />
     </div>
+  );
+}
+
+/** Renders newline/“•”-separated free text as list items without inventing content. */
+function MultiLineList({ text }: { text: string }) {
+  const items = text
+    .split(/\r?\n|\u2022/)
+    .map((s) => s.replace(/^[\s\-*·]+/, "").trim())
+    .filter(Boolean);
+  if (items.length <= 1) {
+    return <p className="mt-3 text-sm leading-7 text-ink-secondary whitespace-pre-wrap">{text}</p>;
+  }
+  return (
+    <ul className="mt-3 space-y-2 text-sm leading-6 text-ink-secondary">
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-2">
+          <span aria-hidden className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

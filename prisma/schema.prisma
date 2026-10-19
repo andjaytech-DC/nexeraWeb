@@ -40,6 +40,12 @@ model Job {
   responsibilities String  @db.Text
   requirements    String   @db.Text
   preferredSkills String?  @db.Text
+  // Optional per-job intake + eligibility structure. applyEmail receives the
+  // "Apply by Email" mailto (defaults to the sitewide contact inbox when
+  // unset); workMode/shiftInfo render only when set — never fabricated.
+  applyEmail      String?
+  workMode        String?
+  shiftInfo       String?
   status          String   @default("Draft")
   isPublished     Boolean  @default(false)
   createdAt       DateTime @default(now())

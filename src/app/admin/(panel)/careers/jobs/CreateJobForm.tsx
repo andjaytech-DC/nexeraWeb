@@ -8,7 +8,8 @@ export function CreateJobForm() {
   const [form, setForm] = useState({
     title: "", slug: "", department: "", location: "", employmentType: "Full-time",
     experienceLevel: "", description: "", responsibilities: "", requirements: "",
-    preferredSkills: "", status: "Draft", isPublished: false,
+    preferredSkills: "", applyEmail: "", workMode: "", shiftInfo: "",
+    status: "Draft", isPublished: false,
   });
 
   async function submit(e: React.FormEvent) {
@@ -79,6 +80,9 @@ export function CreateJobForm() {
               <textarea value={form.requirements} onChange={(e) => setForm({ ...form, requirements: e.target.value })} rows={3} className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm text-white focus:border-[#4F7EFF]/50 focus:outline-none" />
             </label>
             {field("preferredSkills", "Preferred skills")}
+            {field("applyEmail", "Apply-by email (optional — defaults to the contact inbox)")}
+            {field("workMode", "Work mode (optional, e.g. On-site (Noida))")}
+            {field("shiftInfo", "Shift info (optional, e.g. US-aligned shifts)")}
             <label className="flex items-center gap-2 text-sm text-white/70">
               <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm({ ...form, isPublished: e.target.checked })} />
               Published

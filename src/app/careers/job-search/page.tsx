@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   openGraph: { title: "Job Search — Careers", description: "Search open positions at Nexara Global Solutions by title, keyword, location, department, employment type and experience." },
 };
 
+// Job listings change through the admin panel without a deploy — never bake
+// them into the build output.
+export const dynamic = "force-dynamic";
+
 export default async function JobSearchPage() {
   const jobs = await safeDb(async (db) => {
     return db.job.findMany({

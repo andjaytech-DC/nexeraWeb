@@ -93,6 +93,22 @@ Safety rails already in `src/lib/prisma.ts`: a placeholder
 failures degrade to file storage (careers) or 503s — never fake successes.
 The schema is additive so far; `db push` migrations have not dropped data.
 
+### 4b. Seeding the seven proposed job listings
+
+`npm run db:seed` (after `db push`) upserts the seven approved openings from
+`prisma/seed.ts` — 3 × BPO/HR (Noida, US-aligned shifts for the BPO pair) and
+4 × IT (React/Next.js, backend, AI full-stack, AI engineering). Behaviour:
+
+- **Idempotent by slug.** Existing rows keep every admin edit — re-seeding
+  only re-asserts `isPublished: true` so an unpublished job stays hidden only
+  if you unpublish it again after.
+- **Published immediately** (per owner decision). Unpublish any role HR has
+  not confirmed from Admin → Job Listings without touching code.
+- **Apply-by-email:** every listing's mailto points at
+  `JOBS_APPLY_EMAIL` (default `jay.nexara@gmail.com`, the monitored inbox).
+  Per-job overrides are editable in the admin panel.
+- Without a real `DATABASE_URL` the seed refuses to run (truthful guard).
+
 ## 5. Post-deploy smoke test
 
 Run against the deployed domain, not localhost:
