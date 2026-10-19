@@ -14,6 +14,7 @@ import {
   storeContactSubmission,
   validateContact,
 } from "@/lib/contact-server";
+import { sendInquiryNotification, isEmailConfigured } from "@/lib/email";
 
 /**
  * POST /api/inquiries — accept a contact-form submission.
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // 5. Optional webhook fan-out. Best effort — storage already succeeded, so
+  // 6. Optional webhook fan-out. Best effort — storage already succeeded, so
   //    the client still gets a success, annotated truthfully.
   let forwarded = false;
   if (isWebhookConfigured()) {
@@ -101,7 +102,27 @@ export async function POST(req: Request) {
     }
   }
 
-  return ok({ id, reference, forwarded });
+  // 7. Optional owner notification email. Same best-effort contract: a
+  //    provider/network failure is returned as `emailed: false` + a truthful
+  //    detail — never a fake success, never a failed submission.
+  let emailed = false;
+  let emailDetail = isEmailConfigured() ? undefined : "No email provider configured — nothing was sent.";
+  if (isEmailConfigured()) {
+    const result = await sendInquiryNotification({
+      id, reference, createdAt: new Date().toISOString(),
+      name: fields.name, email: fields.email, company: fields.company ?? "",
+      phone: fields.phone ?? "", service: fields.service, projectType: fields.projectType,
+      budget: fields.budget ?? "", timeline: fields.timeline ?? "",
+      description: fields.description,
+    });
+    emailed = result.sent;
+    emailDetail = result.detail;
+    if (!result.sent) {
+      console.warn("[inquiries] notification email skipped:", result.detail);
+    }
+  }
+
+  return ok({ id, reference, forwarded, emailed, emailDetail });
 }
 
 export async function GET() {

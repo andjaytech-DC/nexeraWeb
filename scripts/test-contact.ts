@@ -154,7 +154,7 @@ srv.listen(0, "127.0.0.1", () => {
           failures++;
           process.env.CONTACT_WEBHOOK_URL = before2;
           errorSrv.close();
-          finish();
+          partDone();
         },
         (e: unknown) => {
           const passed = /^[1-5]/.test((e as { status?: string }).status || "") === false;
@@ -162,7 +162,7 @@ srv.listen(0, "127.0.0.1", () => {
           if (!passed) failures++;
           process.env.CONTACT_WEBHOOK_URL = before2;
           errorSrv.close();
-          finish();
+          partDone();
         }
       );
     });
@@ -170,14 +170,126 @@ srv.listen(0, "127.0.0.1", () => {
     console.log("  FAIL  forwardContactWebhook POSTs the record (threw)");
     failures++;
     process.env.CONTACT_WEBHOOK_URL = before1;
-    finish();
+    partDone();
   });
 });
+
+/* ── email module (`src/lib/email.ts`) ──────────────────────────────────── */
+
+import { isEmailConfigured, sendInquiryNotification } from "../src/lib/email";
+
+const emailInput = {
+  id: "email-test-1",
+  reference: "INQ/TEST/EMAIL/00001A01",
+  createdAt: new Date().toISOString(),
+  name: "Jane Doe",
+  email: "jane@example.com",
+  company: "Acme",
+  phone: "+91 8882033199",
+  service: "Website Design & Development",
+  projectType: "B2B",
+  budget: "Not specified",
+  timeline: "Not specified",
+  description: "A test inquiry notification.",
+};
+
+/**
+ * Both async chains (the contact-webhook section above and the email section
+ * below) must report in before the process exits and prints the summary.
+ */
+let pendingParts = 2;
+function partDone() {
+  pendingParts -= 1;
+  if (pendingParts === 0) finish();
+}
 
 function finish() {
   console.log(failures === 0 ? "\nAll contact server tests passed." : `\n${failures} contact server test(s) failed.`);
   if (serverClose) serverClose();
-  process.exit(failures === 0 ? 0 : 1);
+  // Exit on the next tick so closing server handles finish first — exiting
+  // mid-close trips a libuv assertion on Windows even when all tests pass.
+  setTimeout(() => process.exit(failures === 0 ? 0 : 1), 200);
+}
+
+(function runEmailTests() {
+  const beforeResend = process.env.RESEND_API_KEY;
+  const beforeWebhook = process.env.EMAIL_WEBHOOK_URL;
+  const beforeTo = process.env.CONTACT_TO_EMAIL;
+
+  // 1. No provider → truthful refusal with nothing sent.
+  delete process.env.RESEND_API_KEY;
+  delete process.env.EMAIL_WEBHOOK_URL;
+  delete process.env.CONTACT_TO_EMAIL;
+
+  const disabled = sendInquiryNotification(emailInput).then((r) => {
+    check("disabled provider reports sent=false honestly", r.sent === false && /no email provider/i.test(r.detail));
+    check("isEmailConfigured false with no provider", isEmailConfigured() === false);
+    // 2. Provider present, recipient missing → truthful refusal.
+    process.env.EMAIL_WEBHOOK_URL = "http://127.0.0.1:9/"; // never contacted
+    return sendInquiryNotification(emailInput).then((r2) => {
+      check("missing recipient reports sent=false honestly", r2.sent === false && /recipient/i.test(r2.detail));
+      // 3. Real local webhook: accept case then reject case.
+      process.env.CONTACT_TO_EMAIL = "owner@example.com";
+      return startEmailWebhook();
+    });
+  });
+
+  disabled
+    .then(() => {
+      process.env.EMAIL_WEBHOOK_URL = beforeWebhook;
+      process.env.RESEND_API_KEY = beforeResend;
+      process.env.CONTACT_TO_EMAIL = beforeTo;
+      partDone();
+    })
+    .catch((e: unknown) => {
+      console.log(`  FAIL  email tests crashed: ${String(e)}`);
+      failures++;
+      process.env.EMAIL_WEBHOOK_URL = beforeWebhook;
+      process.env.RESEND_API_KEY = beforeResend;
+      process.env.CONTACT_TO_EMAIL = beforeTo;
+      partDone();
+    });
+})();
+
+/** One local server: accepts the notification on /ok (verifying the payload), rejects on /error. */
+function startEmailWebhook(): Promise<void> {
+  return new Promise((resolve) => {
+    const esrv = http.createServer((req, res) => {
+      if (req.url === "/ok") {
+        let body = "";
+        req.on("data", (c) => (body += c));
+        req.on("end", () => {
+          try {
+            const parsed = JSON.parse(body) as { type?: string; record?: { reference?: string } };
+            check(
+              "email webhook receives inquiry payload",
+              parsed.type === "contact.inquiry.email" && parsed.record?.reference === emailInput.reference,
+            );
+          } catch {
+            check("email webhook receives inquiry payload", false);
+          }
+          res.writeHead(200);
+          res.end();
+        });
+      } else {
+        res.writeHead(500);
+        res.end();
+      }
+    });
+    esrv.listen(0, "127.0.0.1", () => {
+      const port = (esrv.address() as { port: number }).port;
+      process.env.EMAIL_WEBHOOK_URL = `http://127.0.0.1:${port}/ok`;
+      sendInquiryNotification(emailInput).then((r) => {
+        check("email webhook 2xx → sent=true", r.sent === true);
+        process.env.EMAIL_WEBHOOK_URL = `http://127.0.0.1:${port}/error`;
+        sendInquiryNotification(emailInput).then((r2) => {
+          check("email webhook 5xx → sent=false (truthful)", r2.sent === false);
+          esrv.close();
+          resolve();
+        });
+      });
+    });
+  });
 }
 
 
